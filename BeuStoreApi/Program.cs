@@ -1,7 +1,12 @@
 using BeuStoreApi.Entities;
+using BeuStoreApi.Helper;
+using BeuStoreApi.Mapper;
+using BeuStoreApi.Services;
+using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -18,8 +23,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
 
-// identity
 
+    // identity EF
 builder.Services.AddIdentity<Staff, IdentityRole>()
     .AddEntityFrameworkStores<MyDbContext>()
     .AddDefaultTokenProviders();
@@ -46,7 +51,13 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// mapper
+builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
+builder.Services.AddScoped<jwtToken>();
+builder.Services.AddScoped<IAuthStaff, AuthService>();
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

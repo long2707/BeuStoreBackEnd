@@ -16,6 +16,7 @@ namespace BeuStoreApi.Entities
             this.Attrbutes = new HashSet<Attrbutes>();
             this.Variants = new HashSet<Variants>();
             this.Tags= new HashSet<Tags>();
+            this.Cart_Items = new HashSet<Cart_Items>();
         }
         [Key]
         public Guid Id { get; set; }
@@ -46,5 +47,6 @@ namespace BeuStoreApi.Entities
         public virtual ICollection<Attrbutes> Attrbutes { get; set; }   
         public virtual ICollection<Variants> Variants { get; set; }
         public virtual ICollection<Tags> Tags { get; set; }
+        public virtual ICollection<Cart_Items> Cart_Items { get; set;}
     }
 }

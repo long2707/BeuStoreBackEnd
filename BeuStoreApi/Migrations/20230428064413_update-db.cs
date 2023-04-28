@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BeuStoreApi.Migrations
 {
-    public partial class createdb : Migration
+    public partial class updatedb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -79,6 +79,22 @@ namespace BeuStoreApi.Migrations
                         column: x => x.parent_id,
                         principalTable: "categories",
                         principalColumn: "categoryId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "customers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FirstName = table.Column<string>(type: "Varchar(50)", nullable: false),
+                    LastName = table.Column<string>(type: "Varchar(50)", nullable: false),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_customers", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,6 +258,44 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "carts",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    customersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_carts", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_carts_customers_customersid",
+                        column: x => x.customersid,
+                        principalTable: "customers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "orders",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    customersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    create_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    update_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orders", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_orders_customers_customersid",
+                        column: x => x.customersid,
+                        principalTable: "customers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AttrbutesProducts",
                 columns: table => new
                 {
@@ -353,6 +407,60 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "cart_items",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Cartsid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    stauts = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_cart_items", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_cart_items_carts_Cartsid",
+                        column: x => x.Cartsid,
+                        principalTable: "carts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_cart_items_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "orderItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Ordersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    price = table.Column<decimal>(type: "NUMERIC(18,2)", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_orderItems_orders_Ordersid",
+                        column: x => x.Ordersid,
+                        principalTable: "orders",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_orderItems_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AttrbuteValueVariants",
                 columns: table => new
                 {
@@ -452,6 +560,21 @@ namespace BeuStoreApi.Migrations
                 column: "Attrbutesid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_cart_items_Cartsid",
+                table: "cart_items",
+                column: "Cartsid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_cart_items_ProductsId",
+                table: "cart_items",
+                column: "ProductsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_carts_customersid",
+                table: "carts",
+                column: "customersid");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_categories_parent_id",
                 table: "categories",
                 column: "parent_id");
@@ -470,6 +593,21 @@ namespace BeuStoreApi.Migrations
                 name: "IX_gallerles_productsId",
                 table: "gallerles",
                 column: "productsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orderItems_Ordersid",
+                table: "orderItems",
+                column: "Ordersid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orderItems_ProductsId",
+                table: "orderItems",
+                column: "ProductsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_customersid",
+                table: "orders",
+                column: "customersid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_product_name",
@@ -516,10 +654,16 @@ namespace BeuStoreApi.Migrations
                 name: "AttrbuteValueVariants");
 
             migrationBuilder.DropTable(
+                name: "cart_items");
+
+            migrationBuilder.DropTable(
                 name: "CategoriesProducts");
 
             migrationBuilder.DropTable(
                 name: "gallerles");
+
+            migrationBuilder.DropTable(
+                name: "orderItems");
 
             migrationBuilder.DropTable(
                 name: "ProductsTags");
@@ -537,7 +681,13 @@ namespace BeuStoreApi.Migrations
                 name: "Attribute_Value");
 
             migrationBuilder.DropTable(
+                name: "carts");
+
+            migrationBuilder.DropTable(
                 name: "categories");
+
+            migrationBuilder.DropTable(
+                name: "orders");
 
             migrationBuilder.DropTable(
                 name: "tags");
@@ -547,6 +697,9 @@ namespace BeuStoreApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "attributes");
+
+            migrationBuilder.DropTable(
+                name: "customers");
 
             migrationBuilder.DropTable(
                 name: "Products");

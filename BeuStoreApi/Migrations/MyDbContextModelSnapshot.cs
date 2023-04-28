@@ -95,6 +95,49 @@ namespace BeuStoreApi.Migrations
                     b.ToTable("Attribute_Value");
                 });
 
+            modelBuilder.Entity("BeuStoreApi.Entities.Cart_Items", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Cartsid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("stauts")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cartsid");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("cart_items");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Carts", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("customersid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("customersid");
+
+                    b.ToTable("carts");
+                });
+
             modelBuilder.Entity("BeuStoreApi.Entities.Categories", b =>
                 {
                     b.Property<Guid>("categoryId")
@@ -117,6 +160,36 @@ namespace BeuStoreApi.Migrations
                     b.HasIndex("parent_id");
 
                     b.ToTable("categories");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Customers", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("Varchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("Varchar(50)");
+
+                    b.Property<DateTime>("created_at")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("customers");
                 });
 
             modelBuilder.Entity("BeuStoreApi.Entities.Gallerles", b =>
@@ -142,6 +215,55 @@ namespace BeuStoreApi.Migrations
                     b.HasIndex("productsId");
 
                     b.ToTable("gallerles");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.OrderItems", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Ordersid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("price")
+                        .HasColumnType("NUMERIC(18,2)");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ordersid");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("orderItems");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Orders", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("create_at")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("customersid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("update_at")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("customersid");
+
+                    b.ToTable("orders");
                 });
 
             modelBuilder.Entity("BeuStoreApi.Entities.Products", b =>
@@ -521,6 +643,36 @@ namespace BeuStoreApi.Migrations
                     b.Navigation("Attrbutes");
                 });
 
+            modelBuilder.Entity("BeuStoreApi.Entities.Cart_Items", b =>
+                {
+                    b.HasOne("BeuStoreApi.Entities.Carts", "Carts")
+                        .WithMany("items")
+                        .HasForeignKey("Cartsid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BeuStoreApi.Entities.Products", "Products")
+                        .WithMany("Cart_Items")
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Carts");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Carts", b =>
+                {
+                    b.HasOne("BeuStoreApi.Entities.Customers", "customers")
+                        .WithMany("carts")
+                        .HasForeignKey("customersid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("customers");
+                });
+
             modelBuilder.Entity("BeuStoreApi.Entities.Categories", b =>
                 {
                     b.HasOne("BeuStoreApi.Entities.Categories", "Parent")
@@ -539,6 +691,36 @@ namespace BeuStoreApi.Migrations
                         .IsRequired();
 
                     b.Navigation("products");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.OrderItems", b =>
+                {
+                    b.HasOne("BeuStoreApi.Entities.Orders", "Orders")
+                        .WithMany("orders")
+                        .HasForeignKey("Ordersid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BeuStoreApi.Entities.Products", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Orders", b =>
+                {
+                    b.HasOne("BeuStoreApi.Entities.Customers", "customers")
+                        .WithMany("orders")
+                        .HasForeignKey("customersid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("customers");
                 });
 
             modelBuilder.Entity("BeuStoreApi.Entities.Variants", b =>
@@ -649,13 +831,32 @@ namespace BeuStoreApi.Migrations
                     b.Navigation("attrbutes");
                 });
 
+            modelBuilder.Entity("BeuStoreApi.Entities.Carts", b =>
+                {
+                    b.Navigation("items");
+                });
+
             modelBuilder.Entity("BeuStoreApi.Entities.Categories", b =>
                 {
                     b.Navigation("Children");
                 });
 
+            modelBuilder.Entity("BeuStoreApi.Entities.Customers", b =>
+                {
+                    b.Navigation("carts");
+
+                    b.Navigation("orders");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.Orders", b =>
+                {
+                    b.Navigation("orders");
+                });
+
             modelBuilder.Entity("BeuStoreApi.Entities.Products", b =>
                 {
+                    b.Navigation("Cart_Items");
+
                     b.Navigation("Gallerles");
 
                     b.Navigation("Variants");

@@ -18,6 +18,11 @@ namespace BeuStoreApi.Entities
         public DbSet<AttrbuteValue> attributesValue { get; set; }
         public DbSet<Variants> variants { get; set; }
         public DbSet<VariantValues> variantValues { get; set; }
+        public DbSet<OrderItems> orderItems { get; set; }   
+        public DbSet<Orders> orders { get; set; }
+        public DbSet<Customers> customers { get; set; }
+        public DbSet<Carts> carts { get; set; }
+        public DbSet<Cart_Items> cart_items { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

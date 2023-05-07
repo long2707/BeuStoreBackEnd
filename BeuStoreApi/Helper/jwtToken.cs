@@ -27,8 +27,9 @@ namespace BeuStoreApi.Helper
         }
         private JwtSecurityToken Verify(string? token)
         {
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]);
+            var key = Encoding.UTF8.GetBytes(configuration["JWT:Secret"]);
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,

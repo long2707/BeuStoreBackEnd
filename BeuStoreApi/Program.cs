@@ -91,6 +91,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddScoped<jwtToken>();
 builder.Services.AddScoped<IAuthStaff, AuthService>();
 builder.Services.AddScoped<ICategories, CategoryService>();
+builder.Services.AddScoped<IProducts,  ProductService>();
 var app = builder.Build();
 
 

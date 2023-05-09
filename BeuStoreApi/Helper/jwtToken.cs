@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BeuStoreApi.Helper
@@ -20,7 +21,7 @@ namespace BeuStoreApi.Helper
                 configuration["JWT:ValidIssuer"],
                 configuration["JWT:ValidAudience"],
                 claims,
-                expires: DateTime.UtcNow.AddDays(2),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: singIn
                 );
             return token;
@@ -36,10 +37,22 @@ namespace BeuStoreApi.Helper
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
                 ValidateAudience = false,
+
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 
             return (JwtSecurityToken)validatedToken;
         }
+        public string RefreshToken()
+        {
+            var ramdomNumber = new byte[32];
+            using(var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(ramdomNumber);
+                return Convert.ToBase64String(ramdomNumber);
+            }
+        }
+
+
     }
 }

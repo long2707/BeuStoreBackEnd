@@ -1,4 +1,5 @@
-﻿using BeuStoreApi.Models;
+﻿using BeuStoreApi.Helper;
+using BeuStoreApi.Models;
 using BeuStoreApi.Models.StaffDTO;
 using BeuStoreApi.Services;
 using BeuStoreApi.Services.interfaces;
@@ -12,9 +13,11 @@ namespace BeuStoreApi.Controllers
     public class AuthStaffController : ControllerBase
     {
         private readonly IAuthStaff _authService;
-        public AuthStaffController( IAuthStaff authService ) 
+        private readonly jwtToken _jwtToken;
+        public AuthStaffController( IAuthStaff authService, jwtToken jwtToken ) 
         { 
             _authService = authService;
+            _jwtToken = jwtToken;
         }
 
         [HttpPost("register")]
@@ -26,6 +29,12 @@ namespace BeuStoreApi.Controllers
         public async Task<statusDTO> LoginStaff([FromBody] LoginDTO loginDTO)
         {
             return await _authService.LoginStaff(loginDTO);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<statusDTO> RefreshToken([FromBody] TokenDTO tokenDTO)
+        {
+            return await _authService.RenewToken(tokenDTO);
         }
     }
 }

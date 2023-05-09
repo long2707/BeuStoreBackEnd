@@ -9,6 +9,7 @@ namespace BeuStoreApi.Services.interfaces
     {
         Task<statusDTO> RegisterStaff(RegisterDTO registerDTO);
         Task<statusDTO> LoginStaff(LoginDTO loginDTO);
+        Task<statusDTO> RenewToken(TokenDTO tokenDTO);
 
     }
 }

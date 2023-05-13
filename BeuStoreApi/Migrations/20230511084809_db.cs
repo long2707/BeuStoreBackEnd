@@ -105,10 +105,10 @@ namespace BeuStoreApi.Migrations
                     product_name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     SKU = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     regular_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    discount_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    discount_price = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
                     quantity = table.Column<int>(type: "int", nullable: false),
                     product_description = table.Column<string>(type: "TEXT", nullable: false),
-                    created_at = table.Column<byte[]>(type: "TIMESTAMP", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     update_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     createed_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     updated_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -384,25 +384,6 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "variants",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    product_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_variants", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_variants_Products_productsId",
-                        column: x => x.productsId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProductsTags",
                 columns: table => new
                 {
@@ -480,51 +461,6 @@ namespace BeuStoreApi.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "AttrbuteValueVariants",
-                columns: table => new
-                {
-                    AttrbuteValueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VariantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AttrbuteValueVariants", x => new { x.AttrbuteValueId, x.VariantsId });
-                    table.ForeignKey(
-                        name: "FK_AttrbuteValueVariants_Attribute_Value_AttrbuteValueId",
-                        column: x => x.AttrbuteValueId,
-                        principalTable: "Attribute_Value",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AttrbuteValueVariants_variants_VariantsId",
-                        column: x => x.VariantsId,
-                        principalTable: "variants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "variantValues",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    variant_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    price = table.Column<decimal>(type: "NUMERIC(18,2)", nullable: false),
-                    quantity = table.Column<int>(type: "int", nullable: false),
-                    variantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_variantValues", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_variantValues_variants_variantsId",
-                        column: x => x.variantsId,
-                        principalTable: "variants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -568,11 +504,6 @@ namespace BeuStoreApi.Migrations
                 name: "IX_AttrbutesProducts_productsId",
                 table: "AttrbutesProducts",
                 column: "productsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AttrbuteValueVariants_VariantsId",
-                table: "AttrbuteValueVariants",
-                column: "VariantsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attribute_Value_Attrbutesid",
@@ -643,16 +574,6 @@ namespace BeuStoreApi.Migrations
                 name: "IX_refreshTokens_userId",
                 table: "refreshTokens",
                 column: "userId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_variants_productsId",
-                table: "variants",
-                column: "productsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_variantValues_variantsId",
-                table: "variantValues",
-                column: "variantsId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -676,7 +597,7 @@ namespace BeuStoreApi.Migrations
                 name: "AttrbutesProducts");
 
             migrationBuilder.DropTable(
-                name: "AttrbuteValueVariants");
+                name: "Attribute_Value");
 
             migrationBuilder.DropTable(
                 name: "cart_items");
@@ -697,13 +618,10 @@ namespace BeuStoreApi.Migrations
                 name: "refreshTokens");
 
             migrationBuilder.DropTable(
-                name: "variantValues");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Attribute_Value");
+                name: "attributes");
 
             migrationBuilder.DropTable(
                 name: "carts");
@@ -715,22 +633,16 @@ namespace BeuStoreApi.Migrations
                 name: "orders");
 
             migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
                 name: "tags");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "variants");
-
-            migrationBuilder.DropTable(
-                name: "attributes");
-
-            migrationBuilder.DropTable(
                 name: "customers");
-
-            migrationBuilder.DropTable(
-                name: "Products");
         }
     }
 }

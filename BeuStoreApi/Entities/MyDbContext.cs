@@ -15,9 +15,7 @@ namespace BeuStoreApi.Entities
         public DbSet<Gallerles> gallerles { get; set; }
         public DbSet<Tags> tags { get; set; }
         public DbSet<Attrbutes> attributes { get; set; }
-        public DbSet<AttrbuteValue> attributesValue { get; set; }
-        public DbSet<Variants> variants { get; set; }
-        public DbSet<VariantValues> variantValues { get; set; }
+        public DbSet<AttrbuteValue> attributeValue { get; set; }
         public DbSet<OrderItems> orderItems { get; set; }   
         public DbSet<Orders> orders { get; set; }
         public DbSet<Customers> customers { get; set; }

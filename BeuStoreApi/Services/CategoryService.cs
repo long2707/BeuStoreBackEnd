@@ -128,7 +128,7 @@ namespace BeuStoreApi.Services
         }
 
         private ICollection<Categories> BuildCategoriesTree(Guid id, List<Categories> categories)
-        {
+        { 
             var menus = categories.Where(item => item.parent_id == id);
             foreach(var menu in menus)
             {

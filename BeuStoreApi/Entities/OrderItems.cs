@@ -8,7 +8,7 @@ namespace BeuStoreApi.Entities
         public Products Products { get; set; }
         public Orders Orders { get; set; }
         [Column(TypeName ="NUMERIC(18,2)")]
-        public Decimal price { get; set; }
+        public decimal price { get; set; }
         public int quantity { get; set; }
     }
 }

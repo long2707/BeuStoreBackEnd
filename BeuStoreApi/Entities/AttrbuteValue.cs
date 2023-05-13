@@ -16,6 +16,6 @@ namespace BeuStoreApi.Entities
         [Column(TypeName ="NVARCHAR(50)")]
         public string? color { get; set; }
         public Attrbutes Attrbutes { get; set; }
-        public virtual ICollection<Variants> Variants { get; set; }  
+        
     }
 }

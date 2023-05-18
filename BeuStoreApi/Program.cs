@@ -86,6 +86,15 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+builder.Services.AddCors( p=> p.AddPolicy("MyCors", build =>
+{
+    build.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+})
+);
+
 // mapper
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddScoped<jwtToken>();
@@ -104,6 +113,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("MyCors");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -5,30 +5,37 @@ using BeuStoreApi.Models;
 using BeuStoreApi.Models.StaffDTO;
 using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 
 namespace BeuStoreApi.Services
 {
     public class AuthService : IAuthStaff
     {
+       
         private readonly MyDbContext _dbContext;
         private readonly UserManager<Staff> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly jwtToken _jwtToken;
-        public AuthService(MyDbContext dbContext , UserManager<Staff> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, jwtToken jwt) 
+        private IHttpContextAccessor _contextAccessor;
+        public AuthService(IHttpContextAccessor httpContextAccessor ,MyDbContext dbContext , UserManager<Staff> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, jwtToken jwt) 
         { 
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _jwtToken = jwt;
+            _contextAccessor = httpContextAccessor;
         }
+
+        public object Response { get; private set; }
+
         public async Task<statusDTO> LoginStaff(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
@@ -84,12 +91,34 @@ namespace BeuStoreApi.Services
                     };
 
                 }
+                var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
+                
+               _contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+                {
+                  // Domain= "localhost:3000",
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    Secure = true, // Set to true if using HTTPS
+                    HttpOnly = true ,// Set to true to prevent client-side JavaScript access
+                     SameSite = SameSiteMode.Strict ,
+                     Path="/"
+                });
+
+
+                _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                {
+                    //Domain= "localhost:3000",
+                    Expires = DateTime.UtcNow.AddDays(1),
+                    Secure = true,
+                    HttpOnly = true,
+                     SameSite = SameSiteMode.Strict ,
+                     Path="/"
+                });
                 return new statusDTO()
                 {
                    Success= true,
                    data= new
                    {
-                       AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+                       AccessToken = accesstoken,
                        RefreshToken =  refreshToken,
                      
                    }
@@ -144,13 +173,13 @@ namespace BeuStoreApi.Services
                    }
                 };
             }
-            if(! await _roleManager.RoleExistsAsync(RoleStaff.Admin))
+            if (!await _roleManager.RoleExistsAsync(RoleStaff.User))
             {
-                await _roleManager.CreateAsync(new IdentityRole(RoleStaff.Admin));
+                await _roleManager.CreateAsync(new IdentityRole(RoleStaff.User));
             }
-            if( await _roleManager.RoleExistsAsync(RoleStaff.Admin))
+            if( await _roleManager.RoleExistsAsync(RoleStaff.User))
             {
-                await _userManager.AddToRoleAsync(createUser,RoleStaff.Admin);
+                await _userManager.AddToRoleAsync(createUser,RoleStaff.User);
             }
             return new statusDTO()
             {
@@ -278,14 +307,35 @@ namespace BeuStoreApi.Services
                     };
 
                 }
+                var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
+                _contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+                {
+                    // Domain= "localhost:3000",
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    Secure = true, // Set to true if using HTTPS
+                    HttpOnly = true,// Set to true to prevent client-side JavaScript access
+                    SameSite = SameSiteMode.Strict,
+                    Path = "/"
+                });
+
+
+                _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                {
+                    //Domain= "localhost:3000",
+                    Expires = DateTime.UtcNow.AddDays(1),
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    Path = "/"
+                });
                 return new statusDTO()
                 {
                     Success = true,
                     data = new
                     {
-                        AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                        RefreshToken = refreshToken,
-                        Exipration = token.ValidTo
+                        accessToken =accesstoken,
+                        refreshToken = refreshToken,
+                       // Exipration = token.ValidTo
                     }
 
 

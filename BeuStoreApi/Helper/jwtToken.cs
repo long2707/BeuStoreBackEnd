@@ -26,7 +26,7 @@ namespace BeuStoreApi.Helper
                 );
             return token;
         }
-        private JwtSecurityToken Verify(string? token)
+        public JwtSecurityToken Verify(string? token)
         {
 
             var tokenHandler = new JwtSecurityTokenHandler();

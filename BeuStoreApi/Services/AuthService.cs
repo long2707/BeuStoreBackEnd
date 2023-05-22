@@ -93,26 +93,35 @@ namespace BeuStoreApi.Services
                 }
                 var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
                 
-               _contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
-                {
-                  // Domain= "localhost:3000",
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    Secure = true, // Set to true if using HTTPS
-                    HttpOnly = true ,// Set to true to prevent client-side JavaScript access
-                     SameSite = SameSiteMode.Strict ,
-                     Path="/"
-                });
+               //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+               // {
+               //   Domain= "localhost:3000",
+               //     Expires = DateTime.UtcNow.AddHours(1),
+               //     Secure = true, // Set to true if using HTTPS
+               //     HttpOnly = true ,// Set to true to prevent client-side JavaScript access
+               //      SameSite = SameSiteMode.Strict ,
+               //      Path="/"
+               // });
 
 
-                _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                {
-                    //Domain= "localhost:3000",
-                    Expires = DateTime.UtcNow.AddDays(1),
-                    Secure = true,
-                    HttpOnly = true,
-                     SameSite = SameSiteMode.Strict ,
-                     Path="/"
-                });
+               // _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+               // {
+               //     Domain= "localhost:3000",
+               //     Expires = DateTime.UtcNow.AddDays(1),
+               //     Secure = true,
+               //     HttpOnly = true,
+               //      SameSite = SameSiteMode.Strict ,
+               //      Path="/"
+               // });
+               // _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
+               // {
+               //     Domain= "localhost:3000",
+               //     Expires = DateTime.UtcNow.AddHours(1),
+               //     Secure = true,
+               //     HttpOnly = true,
+               //     SameSite = SameSiteMode.Strict,
+               //     Path = "/"
+               // });
                 return new statusDTO()
                 {
                    Success= true,
@@ -120,6 +129,7 @@ namespace BeuStoreApi.Services
                    {
                        AccessToken = accesstoken,
                        RefreshToken =  refreshToken,
+                       role = roleUser[0]
                      
                    }
 
@@ -328,6 +338,15 @@ namespace BeuStoreApi.Services
                     SameSite = SameSiteMode.Strict,
                     Path = "/"
                 });
+                _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
+                {
+                    //Domain= "localhost:3000",
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    Path = "/"
+                });
                 return new statusDTO()
                 {
                     Success = true,
@@ -335,6 +354,7 @@ namespace BeuStoreApi.Services
                     {
                         accessToken =accesstoken,
                         refreshToken = refreshToken,
+                        role = roleUser[0]
                        // Exipration = token.ValidTo
                     }
 
@@ -350,7 +370,24 @@ namespace BeuStoreApi.Services
                 };
             }
         }
- 
+         public  statusDTO getAuth(string token)
+        {
+            var verifyToken = _jwtToken.Verify(token);
+            var idUser = verifyToken.Claims.First(x => x.Type == "Id").Value;
+            var emailUser = verifyToken.Claims.First(x=> x.Type== "Email").Value;
+            var roleUser = verifyToken.Claims.First(x => x.Type == "role").Value;
+
+            return new statusDTO()
+            {
+                Success = true,
+                data =new {
+                  id= idUser,
+                  email= emailUser,
+                  role=roleUser,
+              }
+            };
+
+        }
 
     }
 }

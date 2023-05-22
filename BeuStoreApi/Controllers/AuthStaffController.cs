@@ -3,6 +3,7 @@ using BeuStoreApi.Models;
 using BeuStoreApi.Models.StaffDTO;
 using BeuStoreApi.Services;
 using BeuStoreApi.Services.interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +36,12 @@ namespace BeuStoreApi.Controllers
         public async Task<statusDTO> RefreshToken([FromBody] TokenDTO tokenDTO)
         {
             return await _authService.RenewToken(tokenDTO);
+        }
+        [HttpPost("get-auth")]
+        [Authorize]
+        public statusDTO getAuth(string token)
+        {
+            return _authService.getAuth(token);
         }
     }
 }

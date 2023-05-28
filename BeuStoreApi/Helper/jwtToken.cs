@@ -22,7 +22,7 @@ namespace BeuStoreApi.Helper
                 configuration["JWT:ValidIssuer"],
                 configuration["JWT:ValidAudience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(1),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: singIn
                 );
             return token;

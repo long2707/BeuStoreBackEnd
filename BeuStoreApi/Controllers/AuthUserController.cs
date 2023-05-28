@@ -1,6 +1,7 @@
 ﻿using BeuStoreApi.Helper;
 using BeuStoreApi.Models;
 using BeuStoreApi.Models.StaffDTO;
+using BeuStoreApi.Models.UserDTO;
 using BeuStoreApi.Services;
 using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +16,7 @@ namespace BeuStoreApi.Controllers
     {
         private readonly IAuthUser _authService;
 
-        public AuthUserController( IAuthUser authService, jwtToken jwtToken ) 
+        public AuthUserController( IAuthUser authService ) 
         { 
             _authService = authService;
 
@@ -42,6 +43,12 @@ namespace BeuStoreApi.Controllers
         public statusDTO getAuth()
         {
             return _authService.getAuth();
+        }
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<statusDTO> ChangePassword([FromBody] ChangPassworDTO changPassworDTO)
+        {
+            return await _authService.ChangePassword(changPassworDTO);
         }
     }
 }

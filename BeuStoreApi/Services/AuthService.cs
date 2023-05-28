@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using BeuStoreApi.Models.UserDTO;
 
 namespace BeuStoreApi.Services
 {
@@ -334,35 +335,7 @@ namespace BeuStoreApi.Services
 
                 }
                 var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
-                //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
-                //{
-                //    // Domain= "localhost:3000",
-                //    Expires = DateTime.UtcNow.AddHours(1),
-                //    Secure = true, // Set to true if using HTTPS
-                //    HttpOnly = true,// Set to true to prevent client-side JavaScript access
-                //    SameSite = SameSiteMode.Strict,
-                //    Path = "/"
-                //});
-
-
-                //_contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                //{
-                //    //Domain= "localhost:3000",
-                //    Expires = DateTime.UtcNow.AddDays(1),
-                //    Secure = true,
-                //    HttpOnly = true,
-                //    SameSite = SameSiteMode.Strict,
-                //    Path = "/"
-                //});
-                //_contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
-                //{
-                //    //Domain= "localhost:3000",
-                //    Expires = DateTime.UtcNow.AddHours(1),
-                //    Secure = true,
-                //    HttpOnly = true,
-                //    SameSite = SameSiteMode.Strict,
-                //    Path = "/"
-                //});
+              
                 return new statusDTO()
                 {
                     Success = true,
@@ -370,14 +343,13 @@ namespace BeuStoreApi.Services
                     {
                         accessToken =accesstoken,
                         refreshToken = refreshToken,
-                        role = roleUser[0]
-                       // Exipration = token.ValidTo
+                       
                     }
 
 
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new statusDTO
                 {
@@ -388,7 +360,7 @@ namespace BeuStoreApi.Services
         }
          public  statusDTO getAuth()
         {
-            string authorizationHeader = (_contextAccessor?.HttpContext?.Request.Headers["Authorization"]);
+            string authorizationHeader = _contextAccessor?.HttpContext?.Request?.Headers["Authorization"];
             string token = authorizationHeader.Substring("Bearer ".Length);
 
             var verifyToken = _jwtToken.Verify(token);
@@ -406,8 +378,45 @@ namespace BeuStoreApi.Services
                     email = emailUser,
                     firstName = firstName,
                     lastName = lastName,
-                  role =roleUser,
+                    role =roleUser,
               }
+            };
+
+        }
+         public async Task<statusDTO> ChangePassword(ChangPassworDTO changPassworDTO)
+        {
+            var user = await _userManager.FindByIdAsync(changPassworDTO.IdUser);
+            if(user == null)
+            {
+                return new statusDTO()
+                {
+                    Success= false,
+                    data = new
+                    {
+                        Message = "người dùng không tồn tại",
+
+                    }
+                };
+            }
+            var result = await _userManager.ChangePasswordAsync(user, changPassworDTO.oldPassword, changPassworDTO.newPassword);
+            if(result.Succeeded)
+            {
+                return new statusDTO()
+                {
+                    Success = true,
+                    data = new
+                    {
+                        Message = "Cập nhật mật khẩu thành công"
+                    }
+                };
+            }
+            return new statusDTO()
+            {
+                Success = false,
+                data = new
+                {
+                    Message = "Mật khẩu cũ nhập sai"
+                }
             };
 
         }

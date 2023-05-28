@@ -2,6 +2,7 @@
 using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace BeuStoreApi.Controllers
 {
@@ -23,10 +24,10 @@ namespace BeuStoreApi.Controllers
         }
 
         [HttpPost]
-        public async Task<statusDTO> CreateProductAsync([FromBody] ProductDTO product)
+        public async Task<statusDTO> CreateProductAsync([FromForm] ProductDTO product, List<IFormFile> formFiles)
         {
 
-            return await _product.createProductAsync(product);
+            return await _product.createProductAsync(product, formFiles);
         }
 
     }

@@ -15,16 +15,16 @@ using System.Net.Http;
 
 namespace BeuStoreApi.Services
 {
-    public class AuthService : IAuthStaff
+    public class AuthService : IAuthUser
     {
        
         private readonly MyDbContext _dbContext;
-        private readonly UserManager<Staff> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly jwtToken _jwtToken;
         private IHttpContextAccessor _contextAccessor;
-        public AuthService(IHttpContextAccessor httpContextAccessor ,MyDbContext dbContext , UserManager<Staff> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, jwtToken jwt) 
+        public AuthService(IHttpContextAccessor httpContextAccessor ,MyDbContext dbContext , UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, jwtToken jwt) 
         { 
             _dbContext = dbContext;
             _userManager = userManager;
@@ -36,7 +36,7 @@ namespace BeuStoreApi.Services
 
         public object Response { get; private set; }
 
-        public async Task<statusDTO> LoginStaff(LoginDTO loginDTO)
+        public async Task<statusDTO> Login(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if(user != null && await _userManager.CheckPasswordAsync(user, loginDTO.Password)) 
@@ -48,6 +48,8 @@ namespace BeuStoreApi.Services
 
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("Id", user.Id.ToString()),
+                    new Claim("firstName", user.firstName),
+                    new Claim("lastName", user.lastName),
                     new Claim("Email", user.Email)
                 };
 
@@ -129,7 +131,15 @@ namespace BeuStoreApi.Services
                    {
                        AccessToken = accesstoken,
                        RefreshToken =  refreshToken,
-                       role = roleUser[0]
+                       
+                       User= new 
+                       {
+                           id= user.Id,
+                           email= user.Email,
+                           firstName= user.firstName,
+                           lastName= user.lastName,
+                           role = roleUser[0],
+                       }
                      
                    }
 
@@ -148,7 +158,7 @@ namespace BeuStoreApi.Services
 
 
 
-        public async Task<statusDTO> RegisterStaff(RegisterDTO registerDTO)
+        public async Task<statusDTO> Register(RegisterDTO registerDTO)
         {
             var userExits =await _userManager.FindByEmailAsync(registerDTO.Email);
             if(userExits != null)
@@ -164,10 +174,12 @@ namespace BeuStoreApi.Services
                 };
                 return (data) ;
             }
-            var createUser = new Staff()
+            var createUser = new User()
             {
                 Email = registerDTO.Email,
                 UserName = registerDTO.Email,
+                firstName= registerDTO.FirstName,
+                lastName= registerDTO.LastName,
                 
                 
             };
@@ -183,13 +195,13 @@ namespace BeuStoreApi.Services
                    }
                 };
             }
-            if (!await _roleManager.RoleExistsAsync(RoleStaff.User))
+            if (!await _roleManager.RoleExistsAsync(RoleUser.User))
             {
-                await _roleManager.CreateAsync(new IdentityRole(RoleStaff.User));
+                await _roleManager.CreateAsync(new IdentityRole(RoleUser.User));
             }
-            if( await _roleManager.RoleExistsAsync(RoleStaff.User))
+            if( await _roleManager.RoleExistsAsync(RoleUser.User))
             {
-                await _userManager.AddToRoleAsync(createUser,RoleStaff.User);
+                await _userManager.AddToRoleAsync(createUser,RoleUser.User);
             }
             return new statusDTO()
             {
@@ -272,7 +284,11 @@ namespace BeuStoreApi.Services
 
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("Id", user.Id.ToString()),
+                     new Claim("Id", user.Id.ToString()),
+                    new Claim("firstName", user.firstName),
+                    new Claim("lastName", user.lastName),
                     new Claim("Email", user.Email)
+                  
                 };
 
                 foreach (var userRole in roleUser)
@@ -318,35 +334,35 @@ namespace BeuStoreApi.Services
 
                 }
                 var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
-                _contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
-                {
-                    // Domain= "localhost:3000",
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    Secure = true, // Set to true if using HTTPS
-                    HttpOnly = true,// Set to true to prevent client-side JavaScript access
-                    SameSite = SameSiteMode.Strict,
-                    Path = "/"
-                });
+                //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+                //{
+                //    // Domain= "localhost:3000",
+                //    Expires = DateTime.UtcNow.AddHours(1),
+                //    Secure = true, // Set to true if using HTTPS
+                //    HttpOnly = true,// Set to true to prevent client-side JavaScript access
+                //    SameSite = SameSiteMode.Strict,
+                //    Path = "/"
+                //});
 
 
-                _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                {
-                    //Domain= "localhost:3000",
-                    Expires = DateTime.UtcNow.AddDays(1),
-                    Secure = true,
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                    Path = "/"
-                });
-                _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
-                {
-                    //Domain= "localhost:3000",
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    Secure = true,
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                    Path = "/"
-                });
+                //_contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                //{
+                //    //Domain= "localhost:3000",
+                //    Expires = DateTime.UtcNow.AddDays(1),
+                //    Secure = true,
+                //    HttpOnly = true,
+                //    SameSite = SameSiteMode.Strict,
+                //    Path = "/"
+                //});
+                //_contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
+                //{
+                //    //Domain= "localhost:3000",
+                //    Expires = DateTime.UtcNow.AddHours(1),
+                //    Secure = true,
+                //    HttpOnly = true,
+                //    SameSite = SameSiteMode.Strict,
+                //    Path = "/"
+                //});
                 return new statusDTO()
                 {
                     Success = true,
@@ -370,20 +386,27 @@ namespace BeuStoreApi.Services
                 };
             }
         }
-         public  statusDTO getAuth(string token)
+         public  statusDTO getAuth()
         {
+            string authorizationHeader = (_contextAccessor?.HttpContext?.Request.Headers["Authorization"]);
+            string token = authorizationHeader.Substring("Bearer ".Length);
+
             var verifyToken = _jwtToken.Verify(token);
             var idUser = verifyToken.Claims.First(x => x.Type == "Id").Value;
             var emailUser = verifyToken.Claims.First(x=> x.Type== "Email").Value;
+            var firstName = verifyToken.Claims.First(x => x.Type == "firstName").Value;
+            var lastName = verifyToken.Claims.First(x => x.Type == "lastName").Value;
             var roleUser = verifyToken.Claims.First(x => x.Type == "role").Value;
 
             return new statusDTO()
             {
                 Success = true,
-                data =new {
-                  id= idUser,
-                  email= emailUser,
-                  role=roleUser,
+                data = new {
+                    id = idUser,
+                    email = emailUser,
+                    firstName = firstName,
+                    lastName = lastName,
+                  role =roleUser,
               }
             };
 

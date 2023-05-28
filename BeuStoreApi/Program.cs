@@ -31,7 +31,7 @@ builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(build
 
 
     // identity EF
-builder.Services.AddIdentity<Staff, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<MyDbContext>()
     .AddDefaultTokenProviders();
 
@@ -98,7 +98,7 @@ builder.Services.AddCors( p=> p.AddPolicy("MyCors", build =>
 // mapper
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddScoped<jwtToken>();
-builder.Services.AddScoped<IAuthStaff, AuthService>();
+builder.Services.AddScoped<IAuthUser, AuthService>();
 builder.Services.AddScoped<ICategories, CategoryService>();
 builder.Services.AddScoped<IProducts,  ProductService>();
 var app = builder.Build();

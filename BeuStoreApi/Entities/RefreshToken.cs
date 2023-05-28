@@ -8,7 +8,7 @@ namespace BeuStoreApi.Entities
 
         public string userId { get; set; }
         [ForeignKey(nameof(userId))]
-        public Staff staff { get; set; }
+        public User user { get; set; }
         public string refreshToken { get; set; }
         public DateTime RefreshTokenExpiry { get; set; }
     }

@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BeuStoreApi.Services.interfaces
 {
-    public interface IAuthStaff
+    public interface IAuthUser
     {
-        Task<statusDTO> RegisterStaff(RegisterDTO registerDTO);
-        Task<statusDTO> LoginStaff(LoginDTO loginDTO);
+        Task<statusDTO> Register(RegisterDTO registerDTO);
+        Task<statusDTO> Login(LoginDTO loginDTO);
         Task<statusDTO> RenewToken(TokenDTO tokenDTO);
-        statusDTO getAuth(string token);
+        statusDTO getAuth();
 
     }
 }

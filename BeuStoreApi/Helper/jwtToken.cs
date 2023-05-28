@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -21,7 +22,7 @@ namespace BeuStoreApi.Helper
                 configuration["JWT:ValidIssuer"],
                 configuration["JWT:ValidAudience"],
                 claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(1),
                 signingCredentials: singIn
                 );
             return token;
@@ -33,11 +34,11 @@ namespace BeuStoreApi.Helper
             var key = Encoding.UTF8.GetBytes(configuration["JWT:Secret"]);
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 

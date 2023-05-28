@@ -19,6 +19,7 @@ namespace BeuStoreApi.Controllers
         }
 
         [HttpGet("categories")]
+        [Authorize]
         public async Task<statusDTO> GetAllAsync()
         {
             return await _categories.GetAll();

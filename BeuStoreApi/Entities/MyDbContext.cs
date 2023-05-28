@@ -4,7 +4,7 @@ using System.Reflection.Emit;
 
 namespace BeuStoreApi.Entities
 {
-    public class MyDbContext:IdentityDbContext<Staff>
+    public class MyDbContext:IdentityDbContext<User>
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {

@@ -9,27 +9,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BeuStoreApi.Controllers
 {
-    [Route("api/auth/staff")]
+    [Route("api/auth")]
     [ApiController]
-    public class AuthStaffController : ControllerBase
+    public class AuthUserController : ControllerBase
     {
-        private readonly IAuthStaff _authService;
-        private readonly jwtToken _jwtToken;
-        public AuthStaffController( IAuthStaff authService, jwtToken jwtToken ) 
+        private readonly IAuthUser _authService;
+
+        public AuthUserController( IAuthUser authService, jwtToken jwtToken ) 
         { 
             _authService = authService;
-            _jwtToken = jwtToken;
+
         }
 
         [HttpPost("register")]
-        public async Task<statusDTO> RegisterStaff([FromBody] RegisterDTO registerDTO)
+        public async Task<statusDTO> Register([FromBody] RegisterDTO registerDTO)
         {
-            return await _authService.RegisterStaff(registerDTO);
+            return await _authService.Register(registerDTO);
         }
         [HttpPost("login")]
-        public async Task<statusDTO> LoginStaff([FromBody] LoginDTO loginDTO)
+        public async Task<statusDTO> Login([FromBody] LoginDTO loginDTO)
         {
-            return await _authService.LoginStaff(loginDTO);
+            return await _authService.Login(loginDTO);
         }
 
         [HttpPost("refresh-token")]
@@ -39,9 +39,9 @@ namespace BeuStoreApi.Controllers
         }
         [HttpPost("get-auth")]
         [Authorize]
-        public statusDTO getAuth(string token)
+        public statusDTO getAuth()
         {
-            return _authService.getAuth(token);
+            return _authService.getAuth();
         }
     }
 }

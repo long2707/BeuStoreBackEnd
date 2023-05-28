@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeuStoreApi.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20230511084809_db")]
-    partial class db
+    [Migration("20230523145811_db-update")]
+    partial class dbupdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -323,7 +323,22 @@ namespace BeuStoreApi.Migrations
                     b.ToTable("refreshTokens");
                 });
 
-            modelBuilder.Entity("BeuStoreApi.Entities.Staff", b =>
+            modelBuilder.Entity("BeuStoreApi.Entities.Tags", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("tag_name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("tags");
+                });
+
+            modelBuilder.Entity("BeuStoreApi.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -375,6 +390,14 @@ namespace BeuStoreApi.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("profileImage")
                         .HasColumnType("nvarchar(max)");
 
@@ -389,21 +412,6 @@ namespace BeuStoreApi.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("BeuStoreApi.Entities.Tags", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("tag_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("tags");
                 });
 
             modelBuilder.Entity("CategoriesProducts", b =>
@@ -677,13 +685,13 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("BeuStoreApi.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("BeuStoreApi.Entities.Staff", "staff")
+                    b.HasOne("BeuStoreApi.Entities.User", "user")
                         .WithMany()
                         .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("staff");
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("CategoriesProducts", b =>
@@ -712,7 +720,7 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BeuStoreApi.Entities.Staff", null)
+                    b.HasOne("BeuStoreApi.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -721,7 +729,7 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BeuStoreApi.Entities.Staff", null)
+                    b.HasOne("BeuStoreApi.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -736,7 +744,7 @@ namespace BeuStoreApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BeuStoreApi.Entities.Staff", null)
+                    b.HasOne("BeuStoreApi.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -745,7 +753,7 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BeuStoreApi.Entities.Staff", null)
+                    b.HasOne("BeuStoreApi.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

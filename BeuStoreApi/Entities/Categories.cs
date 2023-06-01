@@ -17,9 +17,9 @@ namespace BeuStoreApi.Entities
         public string category_Name { get; set; }
         = string.Empty;
 
-        public string category_Description { get; set; }
+        public string category_Description { get; set; }= string.Empty;
         public virtual Categories Parent { get; set; }
         public virtual ICollection<Products> Products { get; set; }
-        public virtual ICollection<Categories> Children { get; set; }
+        public virtual ICollection<Categories> Children { get; set; } = new HashSet<Categories>();  
     }
 }

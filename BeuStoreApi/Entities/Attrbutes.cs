@@ -8,7 +8,7 @@ namespace BeuStoreApi.Entities
         public Attrbutes() 
         {
             this.products = new HashSet<Products>();
-            this.attrbutes = new HashSet<AttrbuteValue>();
+            this.attrbuteValues = new HashSet<AttrbuteValue>();
         }
 
         public Guid id { get; set; }
@@ -16,6 +16,6 @@ namespace BeuStoreApi.Entities
         public string atrribute_name { get; set; }    
         public DateTime create_at { get; set; }
         public virtual ICollection<Products> products { get; set; } 
-        public virtual ICollection<AttrbuteValue> attrbutes { get; set; }
+        public virtual ICollection<AttrbuteValue> attrbuteValues { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BeuStoreApi.Entities;
+using BeuStoreApi.Models.CategoriesModel;
 
 namespace BeuStoreApi.Mapper
 {
@@ -6,7 +8,7 @@ namespace BeuStoreApi.Mapper
     {
         public AutoMapperConfig()
         {
-
+            CreateMap<Categories, CategoriesDTO>();
         }
     }
 }

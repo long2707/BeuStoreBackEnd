@@ -1,4 +1,5 @@
-﻿using BeuStoreApi.Entities;
+﻿using AutoMapper;
+using BeuStoreApi.Entities;
 using BeuStoreApi.Models;
 using BeuStoreApi.Models.CategoriesModel;
 using BeuStoreApi.Services.interfaces;
@@ -9,9 +10,11 @@ namespace BeuStoreApi.Services
     public class CategoryService : ICategories
     {
         private readonly MyDbContext _dbContext;
-        public CategoryService(MyDbContext dbContext) 
+        private readonly IMapper _mapper;
+        public CategoryService(MyDbContext dbContext, IMapper mapper) 
         {
             _dbContext = dbContext;        
+            _mapper = mapper;
         }
         public async Task<statusDTO> DeleteAsync(Guid id)
         {
@@ -48,7 +51,7 @@ namespace BeuStoreApi.Services
             };
         }
 
-        public async Task<statusDTO> GetAll()
+        public async Task<statusDTO> GetAllCategory()
         {
             var menuItems = await _dbContext.categories.Include(x=> x.Children).ToListAsync();
             var rootMenus = menuItems.Where(x=> x.parent_id == null).ToList();
@@ -56,12 +59,13 @@ namespace BeuStoreApi.Services
             {
                 item.Children = BuildCategoriesTree(item.categoryId, menuItems);
             }
+            var result = _mapper.Map<IEnumerable<Categories>, IEnumerable<CategoriesDTO> >(rootMenus);
             return new statusDTO()
             {
                 Success = true,
                 data = new
                 {
-                    data = rootMenus
+                    data = result
                 }
             };
         }

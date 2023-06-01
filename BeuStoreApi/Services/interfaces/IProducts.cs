@@ -4,8 +4,8 @@ namespace BeuStoreApi.Services.interfaces
 {
     public interface IProducts
     {
-        Task<statusDTO> getAllProducts();
+        Task<statusDTO> FetchProducts(int page=1, int pageSize=10);
        //Task<statusDTO> createProductAsync(ProductDTO product);
-       Task<statusDTO> createProductAsync(ProductDTO product, List<IFormFile> formFile);
+       Task<statusDTO> createProductAsync(ProductDTO product);
     }
 }

@@ -6,17 +6,20 @@ namespace BeuStoreApi.Models
     public class ProductDTO
     {
         public string product_name { get; set; } = string.Empty;
-        public string SKU { get; set; }= string.Empty;
-        public string product_description { get; set; }= string.Empty;
+        public string SKU { get; set; } = string.Empty;
+        public string product_description { get; set; } = string.Empty;
         [Required]
         public decimal regular_price { get; set; }
         public decimal? discount_price { get; set; }
         [Required]
         public int quantity { get; set; }
-        public string[] tags { get; set; }
-        public string[] categories { get; set; }
+        public string[] tags { get; set; } = { };
+        public string[] categories { get; set; } = { };
+        public IList<AttributeValuesDTO>? attributeName { get; set; }
+       // public string 
         public Guid created_by { get; set; }
        public ICollection<IFormFile>? thumbails { get; set; }
+        
 
     }
 }

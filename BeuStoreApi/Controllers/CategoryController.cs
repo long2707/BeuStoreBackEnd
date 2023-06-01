@@ -19,10 +19,10 @@ namespace BeuStoreApi.Controllers
         }
 
         [HttpGet("categories")]
-        [Authorize]
+        //[Authorize]
         public async Task<statusDTO> GetAllAsync()
         {
-            return await _categories.GetAll();
+            return await _categories.GetAllCategory();
         }
         [HttpPost("create-category"), Authorize(Roles ="admin")]
         

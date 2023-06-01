@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BeuStoreApi.Models
+namespace BeuStoreApi.Models.ProductsDTO
 {
     public class ProductDTO
     {
@@ -16,10 +16,10 @@ namespace BeuStoreApi.Models
         public string[] tags { get; set; } = { };
         public string[] categories { get; set; } = { };
         public IList<AttributeValuesDTO>? attributeName { get; set; }
-       // public string 
+        // public string 
         public Guid created_by { get; set; }
-       public ICollection<IFormFile>? thumbails { get; set; }
-        
+        public ICollection<IFormFile>? thumbails { get; set; }
+
 
     }
 }

@@ -1,8 +1,10 @@
 ﻿using BeuStoreApi.Entities;
 using BeuStoreApi.Models;
+using BeuStoreApi.Models.ProductsDTO;
 using BeuStoreApi.Services.interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
@@ -64,6 +66,44 @@ namespace BeuStoreApi.Services
                 }
             };
         }
+        public  async Task<statusDTO> DetailProduct(Guid productid)
+        {
+            var result = await _context.products.AsNoTracking()
+                                                  .Include(x => x.Categories)
+                                                  .Include(x => x.Gallerles)
+                                                  .Include(x => x.Attrbutes)
+                                                  .ThenInclude(x => x.attrbuteValues)                                                                                                     
+                                                  .Select(x => new {
+                                                      x.Id,
+                                                      x.product_name,
+                                                      x.product_description,
+                                                      x.regular_price,
+                                                      x.discount_price,
+                                                      x.quantity,
+                                                      x.SKU,
+                                                      category = x.Categories.Select(x => new { x.categoryId, x.category_Name }).ToList(),
+                                                      tags = x.Tags.Select(x => new { x.id, x.tag_name }).ToList(),
+                                                      image = x.Gallerles.Select(a => new { a.id, a.urlImage }).ToList(),
+                                                      attributes = x.Attrbutes.Select(a => new { a.id, a.atrribute_name, s = a.attrbuteValues.Select(x => new { x.Id, x.attribute_value }).ToList() }).ToList(),
+
+                                                  }).FirstOrDefaultAsync(x=> x.Id == productid);
+            if (result != null)
+            {
+                return new statusDTO()
+                {
+                    Success = true,
+                    data= result
+                };
+            }
+            return new statusDTO()
+            {
+                Success = false,
+                data= new
+                {
+                    Message= "Không tìm thấy sản phẩm"
+                }
+            };
+        }
         public async Task<statusDTO> createProductAsync( ProductDTO product)
         {
            var productExited = await _context.products.Where(p => p.product_name == product.product_name)?.FirstOrDefaultAsync();
@@ -111,7 +151,7 @@ namespace BeuStoreApi.Services
                     Success = false,
                     data = new
                     {
-                        message = "Nhập tối thiểu thêm "+ ( 3- tags.Count) +" tags"
+                        message = "Nhập tối thiểu thêm "+ ( 3 - tags.Count) +" tags"
                     }
                 };
             }
@@ -169,6 +209,7 @@ namespace BeuStoreApi.Services
                     {
                         id = new Guid(),
                         product_id = new Guid(),
+                        //a= uploadResult.PublicId,
                         urlImage = uploadResult.SecureUrl.ToString(),
                     };
                     thumbails.Add(newImage);
@@ -243,5 +284,36 @@ namespace BeuStoreApi.Services
                 };
             }
         }
+        public async Task<statusDTO> DeleteProduct(Guid productId)
+        {
+            var result =  await _context.products.AsNoTracking()
+                                                  .Include(x => x.Categories)
+                                                  .Include(x => x.Gallerles)
+                                                  .Include(x => x.Attrbutes)
+                                                  .ThenInclude(x => x.attrbuteValues)
+                                                  .FirstOrDefaultAsync(x => x.Id == productId);
+            if (result == null)
+            {
+                return new statusDTO()
+                {
+                    Success = false,
+                    data = new
+                    {
+                        Message = "Sản phẩm không tồn tại"
+                    }
+                };
+            }
+            _context.products.Remove(result);
+            _context.SaveChanges();
+            return new statusDTO()
+            {
+                Success=true,
+                data= new
+                {
+                    Message= "Xóa sản phẩm thành công"
+                }
+            };
+        }
+
     }
 }

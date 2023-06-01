@@ -1,4 +1,5 @@
 ﻿using BeuStoreApi.Models;
+using BeuStoreApi.Models.ProductsDTO;
 using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,12 +24,23 @@ namespace BeuStoreApi.Controllers
         { 
             return await _product.FetchProducts(page, pageSize);
         }
+        [HttpGet("detail-product")]
+        public async Task<statusDTO> DetailtProduct(Guid productId)
+        {
+            return await _product.DetailProduct(productId);
+        }
 
         [HttpPost("create-product"), Authorize(Roles = "admin")]
         public async Task<statusDTO> CreateProductAsync([FromForm] ProductDTO product)
         {
 
             return await _product.createProductAsync(product);
+        }
+        [HttpDelete("delete-product"), Authorize(Roles ="admin")]
+
+        public async Task<statusDTO> DeleteProduct(Guid productId)
+        {
+            return await _product.DeleteProduct(productId);
         }
 
     }

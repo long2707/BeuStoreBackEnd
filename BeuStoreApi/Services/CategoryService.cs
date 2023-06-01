@@ -116,7 +116,7 @@ namespace BeuStoreApi.Services
                     Success = true,
                     data = new
                     {
-                        Message = "Tạo danh mục thành công"
+                        Message = "Cập nhật danh mục thành công"
                     }
                 };
             }

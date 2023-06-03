@@ -42,6 +42,11 @@ namespace BeuStoreApi.Controllers
         {
             return await _product.DeleteProduct(productId);
         }
+        [HttpPut("update-product")]
+        public async Task<statusDTO> UpdateProduct( Guid productId, [FromBody] UpdateProductDTO updateProduct)
+        {
+            return await _product.UpdateProductAsync(updateProduct, productId);
+        }
 
     }
 }

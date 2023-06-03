@@ -9,5 +9,6 @@ namespace BeuStoreApi.Services.interfaces
         Task<statusDTO> DetailProduct(Guid productId);
         Task<statusDTO> createProductAsync(ProductDTO product);
         Task<statusDTO> DeleteProduct(Guid productId);
+        Task<statusDTO> UpdateProductAsync(UpdateProductDTO updateProduct, Guid productId);
     }
 }

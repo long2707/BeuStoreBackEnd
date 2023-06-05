@@ -37,7 +37,7 @@ namespace BeuStoreApi.Entities
 
         public DateTime? update_at { get; set; } = DateTime.Now;
 
-        public Guid createed_by { get; set; }
+        public Guid created_by { get; set; }
         public Guid updated_by { get; set;}
         public virtual ICollection<Categories> Categories { get; set; }
         public virtual ICollection<Gallerles> Gallerles { get; set; }   

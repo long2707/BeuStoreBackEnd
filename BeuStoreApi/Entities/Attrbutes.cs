@@ -12,8 +12,8 @@ namespace BeuStoreApi.Entities
         }
 
         public Guid id { get; set; }
-        [Column(TypeName ="NVARCHAR(50)")]    
-        public string atrribute_name { get; set; }    
+        [Column(TypeName = "NVARCHAR(50)")]
+        public string atrribute_name { get; set; } = string.Empty;
         public DateTime create_at { get; set; }
         public virtual ICollection<Products> products { get; set; } 
         public virtual ICollection<AttrbuteValue> attrbuteValues { get; set; }

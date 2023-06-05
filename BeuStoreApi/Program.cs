@@ -6,7 +6,6 @@ using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -30,7 +29,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
 
 
-    // identity EF
+// identity EF
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<MyDbContext>()
     .AddDefaultTokenProviders();
@@ -42,7 +41,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
- 
+
     .AddJwtBearer(opt =>
     {
         opt.SaveToken = true;
@@ -86,7 +85,7 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-builder.Services.AddCors( p=> p.AddPolicy("MyCors", build =>
+builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 {
     build.WithOrigins("http://localhost:3000")
                    .AllowAnyHeader()
@@ -100,7 +99,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddScoped<jwtToken>();
 builder.Services.AddScoped<IAuthUser, AuthService>();
 builder.Services.AddScoped<ICategories, CategoryService>();
-builder.Services.AddScoped<IProducts,  ProductService>();
+builder.Services.AddScoped<IProducts, ProductService>();
 var app = builder.Build();
 
 

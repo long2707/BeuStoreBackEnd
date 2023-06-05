@@ -15,8 +15,10 @@ namespace BeuStoreApi.Models.ProductsDTO
         [Required]
         public int quantity { get; set; }
         public string[] tags { get; set; } = { };
-        public ICollection<UpdateCategoryDTO> updateCategories { get; set; }
-        public IList<UpdateAttributeDTO> updateAttributes { get; set; }
+        public ICollection<UpdateCategoryDTO> updateCategories { get; set; } = new List<UpdateCategoryDTO>();
+        public IList<UpdateAttributeDTO> updateAttributes { get; set; }= new List<UpdateAttributeDTO>();
+        public ICollection<string>? thumbailUrls { get; set;} = new List<string>();
+        public ICollection<IFormFile>? thumbailFiles { get; set; } = new List<IFormFile>();
         public Guid created_by { get; set; }
 
     }

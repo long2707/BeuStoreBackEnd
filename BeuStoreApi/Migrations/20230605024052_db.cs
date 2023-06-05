@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BeuStoreApi.Migrations
 {
-    public partial class dbupdate : Migration
+    public partial class db : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -56,7 +56,7 @@ namespace BeuStoreApi.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    atrribute_name = table.Column<string>(type: "VARCHAR(255)", nullable: false),
+                    atrribute_name = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
                     create_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -112,7 +112,7 @@ namespace BeuStoreApi.Migrations
                     product_description = table.Column<string>(type: "TEXT", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     update_at = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    createed_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    created_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     updated_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -371,6 +371,7 @@ namespace BeuStoreApi.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     product_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PublicId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     urlImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },

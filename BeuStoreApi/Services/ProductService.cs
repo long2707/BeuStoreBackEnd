@@ -36,23 +36,21 @@ namespace BeuStoreApi.Services
             var queryable = _context.products;
             var count = await queryable.CountAsync();
            var products =  await queryable.AsNoTracking()
-                                                  .Include(x=> x.Categories)
+                                                  
                                                   .Include(x=>x.Gallerles)
-                                                  .Include(x=> x.Attrbutes)
-                                                  .ThenInclude(x=> x.attrbuteValues)
+                                           
                                                   .Skip((page - 1) * pageSize)
                                                   .Take(pageSize)
                                                   .Select(x=> new {x.Id,
                                                                    x.product_name, 
-                                                                   x.product_description, 
+                                                                  
                                                                    x.regular_price, 
                                                                    x.discount_price, 
                                                                    x.quantity, 
                                                                    x.SKU,
-                                                                   category = x.Categories.Select(x=> new {x.categoryId, x.category_Name}).ToList(),
-                                                                   tags = x.Tags.Select(x=> new {x.id, x.tag_name}).ToList(),
+                                                                 
                                                                    image=x.Gallerles.Select(a=> new {a.id, a.urlImage}).ToList(),
-                                                                   attributes = x.Attrbutes.Select(a=> new {a.id, a.atrribute_name, s= a.attrbuteValues.Select(x=> new {x.Id, x.attribute_value}).ToList()}).ToList(),
+                                                                  
                                                                    
                                                   }).ToListAsync();
             return new statusDTO()
@@ -84,7 +82,7 @@ namespace BeuStoreApi.Services
                                                       category = x.Categories.Select(x => new { x.categoryId, x.category_Name }).ToList(),
                                                       tags = x.Tags.Select(x => new { x.id, x.tag_name }).ToList(),
                                                       image = x.Gallerles.Select(a => new { a.id, a.urlImage }).ToList(),
-                                                      attributes = x.Attrbutes.Select(a => new { a.id, a.atrribute_name, s = a.attrbuteValues.Select(x => new { x.Id, x.attribute_value }).ToList() }).ToList(),
+                                                      attributes = x.Attrbutes.Select(a => new { a.id, a.atrribute_name, data = a.attrbuteValues.Select(x => new { x.Id, x.attribute_value }).ToList() }).ToList(),
 
                                                   }).FirstOrDefaultAsync(x=> x.Id == productid);
             if (result != null)
@@ -104,15 +102,15 @@ namespace BeuStoreApi.Services
                 }
             };
         }
-        public async Task<statusDTO> createProductAsync( ProductDTO product)
+        public async Task<statusDTO> createProductAsync(ProductDTO product)
         {
-           var productExited = await _context.products.Where(p => p.product_name == product.product_name)?.FirstOrDefaultAsync();
-            if(productExited != null)
+            var productExited = await _context.products.FirstOrDefaultAsync(p => p.product_name == product.product_name);
+            if (productExited != null)
             {
                 return new statusDTO()
                 {
                     Success = false,
-                    data= new
+                    data = new
                     {
                         Message = "sản phẩm đã được tạo"
                     }
@@ -120,7 +118,7 @@ namespace BeuStoreApi.Services
             }
             // tags
             var tags = new List<Tags>();
-            if(product.tags.Length == 0)
+            if (product.tags == null || product.tags.Length == 0)
             {
                 return new statusDTO()
                 {
@@ -133,7 +131,7 @@ namespace BeuStoreApi.Services
             }
             foreach (var item in product.tags)
             {
-                var tag = await _context.tags.Where(t => t.tag_name == item)?.FirstOrDefaultAsync();
+                var tag = await _context.tags.FirstOrDefaultAsync(t => t.tag_name == item);
                 if (tag == null)
                 {
                     tag = new Tags()
@@ -151,12 +149,12 @@ namespace BeuStoreApi.Services
                     Success = false,
                     data = new
                     {
-                        message = "Nhập tối thiểu thêm "+ ( 3 - tags.Count) +" tags"
+                        message = "Nhập tối thiểu thêm " + (3 - tags.Count) + " tags"
                     }
                 };
             }
             //categories
-            if(product.categories.Length == 0)
+            if (product.categories == null || product.categories.Length == 0)
             {
                 return new statusDTO()
                 {
@@ -168,10 +166,13 @@ namespace BeuStoreApi.Services
                 };
             }
             var categories = new List<Categories>();
-            foreach(var item in product.categories)
+            foreach (var item in product.categories)
             {
-                var  category = await _context.categories.Where(c => c.category_Name == item).FirstOrDefaultAsync();
-                categories.Add(category);
+                var category = await _context.categories.FirstOrDefaultAsync(c => c.category_Name == item);
+                if(category!= null)
+                {
+                    categories.Add(category);
+                }
 
             }
 
@@ -209,27 +210,27 @@ namespace BeuStoreApi.Services
                     {
                         id = new Guid(),
                         product_id = new Guid(),
-                        publicId = uploadResult.PublicId,
                         urlImage = uploadResult.SecureUrl.ToString(),
                     };
                     thumbails.Add(newImage);
                 }
             }
-           // attribute
+            // attribute
 
-            
-                var attributes = new List<Attrbutes>();
+
+            var attributes = new List<Attrbutes>();
             //    "size": ["M", "XL"],
             //    "colors": ["black", "white"]
             //}
             var dataAttribute = product.attribute;
-            if (product.attribute != null)
+            if (dataAttribute != null)
             {
                 for (int i = 0; i < dataAttribute.Count; i++)
                 {
                     var attributeValues = new List<AttrbuteValue>();
                     foreach (var value in dataAttribute[i]?.valueAttribute)
                     {
+
                         var newAtributeValue = new AttrbuteValue()
                         {
                             Id = new Guid(),
@@ -241,7 +242,7 @@ namespace BeuStoreApi.Services
                     attributes.Add(new Attrbutes()
                     {
                         id = new Guid(),
-                        atrribute_name = dataAttribute[i].Name,
+                        atrribute_name = dataAttribute[i].attribute_name,
                         attrbuteValues = attributeValues,
                         create_at = DateTime.UtcNow
                     });
@@ -258,9 +259,11 @@ namespace BeuStoreApi.Services
                     product_description = product.product_description,
                     regular_price = product.regular_price,
                     discount_price = product.discount_price,
+                    quantity= product.quantity,
+                    created_by= product.created_by,
                     Tags = tags,
                     Categories = categories,
-                    Gallerles= thumbails,
+                    Gallerles = thumbails,
                     Attrbutes = attributes
 
                 };
@@ -284,7 +287,7 @@ namespace BeuStoreApi.Services
                 };
             }
         }
-        public async Task<statusDTO> DeleteProduct(Guid productId)
+            public async Task<statusDTO> DeleteProduct(Guid productId)
         {
             var result =  await _context.products.AsNoTracking()
                                                   .Include(x => x.Categories)
@@ -324,7 +327,7 @@ namespace BeuStoreApi.Services
                                                   .ThenInclude(x => x.attrbuteValues)
                                                   .FirstOrDefaultAsync(x => x.Id == productId);
             
-            if(productExist.Tags != null)
+            if(productExist != null)
             {
                 productExist.Tags.Clear();
                 var tags = new List<Tags>();
@@ -341,7 +344,7 @@ namespace BeuStoreApi.Services
                 }
                 foreach (var item in updateProduct.tags)
                 {
-                    var tag = await _context.tags.Where(t => t.tag_name == item)?.FirstOrDefaultAsync();
+                    var tag = await _context.tags.FirstOrDefaultAsync(t => t.tag_name == item);
                     if (tag == null)
                     {
                         tag = new Tags()
@@ -382,7 +385,7 @@ namespace BeuStoreApi.Services
                 var categories = new List<Categories>();
                 foreach (var item in updateProduct.updateCategories)
                 {
-                    var category = await _context.categories.Where(c => c.categoryId == item.CategoryId).FirstOrDefaultAsync();
+                    var category = await _context.categories.FirstOrDefaultAsync(c => c.categoryId == item.CategoryId);
                    if(category == null)
                     {
                         return new statusDTO()
@@ -399,9 +402,74 @@ namespace BeuStoreApi.Services
 
 
                 }
-              
 
-                //image
+
+                //thubails
+                productExist.Gallerles.Clear();
+                var thumbailUrls = updateProduct.thumbailUrls;
+                var thumbailFiles = updateProduct.thumbailFiles;
+
+                if(thumbailFiles== null && thumbailUrls == null)
+                {
+                    return new statusDTO()
+                    {
+                        Success = false,
+                        data = new
+                        {
+                            Message = "Nhập ít nhất 1 ảnh!"
+                        }
+
+                    };
+                }
+                if (thumbailUrls != null)
+                {
+                    foreach (var item in thumbailUrls)
+                    {
+                        var thumbail = new Gallerles()
+                        {
+                            urlImage= item
+                        };
+                        productExist.Gallerles.Add(thumbail);
+                    }
+                }
+                if(thumbailFiles != null)
+                {
+                    foreach (var item in thumbailFiles)
+                    {
+
+                        if (item.Length > 0)
+                        {
+
+
+                            var uploadResult = new ImageUploadResult();
+                            string titleImage = Regex.Replace(updateProduct.product_name, @"\s", "-");
+                            var urlImage = Guid.NewGuid() + "_" + titleImage;
+                            using (var stream = item.OpenReadStream())
+                            {
+                                var uploadParams = new ImageUploadParams()
+                                {
+                                    File = new FileDescription(urlImage, stream),
+                                    PublicId = urlImage,
+                                    DisplayName = titleImage,
+                                    UniqueFilename = true
+
+                                };
+
+                                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                            }
+
+                            var newImage = new Gallerles()
+                            {
+                                id = new Guid(),
+                                product_id = new Guid(),
+                                PublicId = uploadResult.PublicId,
+                                urlImage = uploadResult.SecureUrl.ToString(),
+                            };
+                           
+                        productExist.Gallerles.Add(newImage);
+                        }
+                    }
+                }
 
                 //var files = product.thumbails;
                 //if (files == null) return new statusDTO() { Success = false, data = new { Message = "ảnh là bắt buôc" } };
@@ -449,7 +517,7 @@ namespace BeuStoreApi.Services
                 //    "colors": ["black", "white"]
                 //}
                 var dataAttribute = updateProduct.updateAttributes;
-                
+
                 if (dataAttribute == null)
                 {
                     return new statusDTO()
@@ -457,7 +525,7 @@ namespace BeuStoreApi.Services
                         Success = false,
                         data = new
                         {
-                            Message = "Nhập thuộc tính sản phẩm"
+                            Message = "Nhập phân loại hàng"
                         }
                     };
                 }
@@ -473,7 +541,7 @@ namespace BeuStoreApi.Services
                             Success = false,
                             data = new
                             {
-                                Message = "Nhập thuộc tính sản phẩm cho" + dataAttribute[i].Name
+                                Message = "Nhập phân loại hàng sản phẩm cho" + dataAttribute[i].Name
                             }
                         };
                     }
@@ -491,12 +559,12 @@ namespace BeuStoreApi.Services
                     {
                         attributeExist.attrbuteValues.Clear();
                         attributeExist.atrribute_name = dataAttribute[i].Name;
-                        attributeExist.attrbuteValues= attributeValues;
+                        attributeExist.attrbuteValues = attributeValues;
                         productExist.Attrbutes.Add(attributeExist);
                     }
                     else
                     {
-                        var  newAttribute = new Attrbutes()
+                        var newAttribute = new Attrbutes()
                         {
                             id = new Guid(),
                             atrribute_name = dataAttribute[i].Name,
@@ -515,6 +583,7 @@ namespace BeuStoreApi.Services
                     productExist.product_description = updateProduct.product_description;
                     productExist.regular_price = updateProduct.regular_price;
                     productExist.discount_price = updateProduct.discount_price;
+                    productExist.quantity= updateProduct.quantity;
 
                   //  _context.Update(productExist);
                     await _context.SaveChangesAsync();
@@ -523,7 +592,7 @@ namespace BeuStoreApi.Services
                         Success = true,
                         data = new
                         {
-                         Message ="Cap nhat san pham thanh cong"   
+                         Message ="Cập nhật sản phẩm thành công"   
                         }
                     };
                 }
@@ -544,7 +613,7 @@ namespace BeuStoreApi.Services
                 Success = false,
                 data = new
                 {
-                    Message = "Khong tim thay san pham"
+                    Message = "Sản phẩm không tồn tại"
                 }
             };
         }

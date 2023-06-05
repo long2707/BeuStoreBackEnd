@@ -15,7 +15,7 @@ namespace BeuStoreApi.Entities
         [Key]
         public Guid id { get; set; }    
         public Guid product_id { get; set; }
-        public string PublicId { get; set; }= string.Empty;
+       public string? PublicId { get; set; }
         public string urlImage { get; set; } = string.Empty;
         
         public Products products { get; set; } 

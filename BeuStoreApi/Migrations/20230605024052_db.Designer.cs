@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeuStoreApi.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20230523145811_db-update")]
-    partial class dbupdate
+    [Migration("20230605024052_db")]
+    partial class db
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,7 +47,7 @@ namespace BeuStoreApi.Migrations
 
                     b.Property<string>("atrribute_name")
                         .IsRequired()
-                        .HasColumnType("VARCHAR(255)");
+                        .HasColumnType("NVARCHAR(50)");
 
                     b.Property<DateTime>("create_at")
                         .HasColumnType("datetime2");
@@ -185,6 +185,9 @@ namespace BeuStoreApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PublicId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("product_id")
                         .HasColumnType("uniqueidentifier");
 
@@ -266,7 +269,7 @@ namespace BeuStoreApi.Migrations
                     b.Property<DateTime?>("created_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("createed_by")
+                    b.Property<Guid>("created_by")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("discount_price")
@@ -595,7 +598,7 @@ namespace BeuStoreApi.Migrations
             modelBuilder.Entity("BeuStoreApi.Entities.AttrbuteValue", b =>
                 {
                     b.HasOne("BeuStoreApi.Entities.Attrbutes", "Attrbutes")
-                        .WithMany("attrbutes")
+                        .WithMany("attrbuteValues")
                         .HasForeignKey("Attrbutesid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -777,7 +780,7 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("BeuStoreApi.Entities.Attrbutes", b =>
                 {
-                    b.Navigation("attrbutes");
+                    b.Navigation("attrbuteValues");
                 });
 
             modelBuilder.Entity("BeuStoreApi.Entities.Carts", b =>

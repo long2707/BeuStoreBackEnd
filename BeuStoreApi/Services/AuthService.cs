@@ -196,13 +196,13 @@ namespace BeuStoreApi.Services
                    }
                 };
             }
-            if (!await _roleManager.RoleExistsAsync(RoleUser.User))
+            if (!await _roleManager.RoleExistsAsync(RoleUser.Admin))
             {
-                await _roleManager.CreateAsync(new IdentityRole(RoleUser.User));
+                await _roleManager.CreateAsync(new IdentityRole(RoleUser.Admin));
             }
-            if( await _roleManager.RoleExistsAsync(RoleUser.User))
+            if( await _roleManager.RoleExistsAsync(RoleUser.Admin))
             {
-                await _userManager.AddToRoleAsync(createUser,RoleUser.User);
+                await _userManager.AddToRoleAsync(createUser,RoleUser.Admin);
             }
             return new statusDTO()
             {

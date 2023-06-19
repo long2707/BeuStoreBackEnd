@@ -63,10 +63,7 @@ namespace BeuStoreApi.Services
             return new statusDTO()
             {
                 Success = true,
-                data = new
-                {
-                    data = result
-                }
+                data = result
             };
         }
 

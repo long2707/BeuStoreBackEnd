@@ -28,7 +28,7 @@ namespace BeuStoreApi.Controllers
             return await _authService.Register(registerDTO);
         }
         [HttpPost("login")]
-        public async Task<statusDTO> Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             return await _authService.Login(loginDTO);
         }

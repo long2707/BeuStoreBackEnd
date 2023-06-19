@@ -1,23 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeuStoreApi.Entities
 {
 
-    [Index(nameof(product_id) )]
+   // [Index(nameof(products) )]
     public class Gallerles
     {
-        public Gallerles() 
-        { 
-            
-        }
+
 
         [Key]
-        public Guid id { get; set; }    
-        public Guid product_id { get; set; }
+        public Guid id { get; set; }
+
        public string? PublicId { get; set; }
         public string urlImage { get; set; } = string.Empty;
         
-        public Products products { get; set; } 
+        public Products products { get; set; } =new Products();
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using BeuStoreApi.Models.UserDTO;
+using System.Net.Mail;
 
 namespace BeuStoreApi.Services
 {
@@ -37,7 +38,7 @@ namespace BeuStoreApi.Services
 
         public object Response { get; private set; }
 
-        public async Task<statusDTO> Login(LoginDTO loginDTO)
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if(user != null && await _userManager.CheckPasswordAsync(user, loginDTO.Password)) 
@@ -83,78 +84,61 @@ namespace BeuStoreApi.Services
                 {
                     _dbContext.SaveChanges();
                 }
-                catch(Exception ex)
+                catch 
                 {
-                    return new statusDTO() { 
-                    Success= false,
-                    data= new
+                    var errorServer = new { message = "Có lỗi xảy ra. Vui lòng thử lại sau" };
+                    return new ObjectResult(errorServer)
                     {
-                        Message= ex.Message,
-                    }
+                        StatusCode = 500 // Trả về mã lỗi 500 (Internal Server Error)
                     };
 
                 }
                 var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
-                
-               //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
-               // {
-               //   Domain= "localhost:3000",
-               //     Expires = DateTime.UtcNow.AddHours(1),
-               //     Secure = true, // Set to true if using HTTPS
-               //     HttpOnly = true ,// Set to true to prevent client-side JavaScript access
-               //      SameSite = SameSiteMode.Strict ,
-               //      Path="/"
-               // });
+
+                //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+                // {
+                //   Domain= "localhost:3000",
+                //     Expires = DateTime.UtcNow.AddHours(1),
+                //     Secure = true, // Set to true if using HTTPS
+                //     HttpOnly = true ,// Set to true to prevent client-side JavaScript access
+                //      SameSite = SameSiteMode.Strict ,
+                //      Path="/"
+                // });
 
 
-               // _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-               // {
-               //     Domain= "localhost:3000",
-               //     Expires = DateTime.UtcNow.AddDays(1),
-               //     Secure = true,
-               //     HttpOnly = true,
-               //      SameSite = SameSiteMode.Strict ,
-               //      Path="/"
-               // });
-               // _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
-               // {
-               //     Domain= "localhost:3000",
-               //     Expires = DateTime.UtcNow.AddHours(1),
-               //     Secure = true,
-               //     HttpOnly = true,
-               //     SameSite = SameSiteMode.Strict,
-               //     Path = "/"
-               // });
-                return new statusDTO()
+                // _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                // {
+                //     Domain= "localhost:3000",
+                //     Expires = DateTime.UtcNow.AddDays(1),
+                //     Secure = true,
+                //     HttpOnly = true,
+                //      SameSite = SameSiteMode.Strict ,
+                //      Path="/"
+                // });
+                // _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
+                // {
+                //     Domain= "localhost:3000",
+                //     Expires = DateTime.UtcNow.AddHours(1),
+                //     Secure = true,
+                //     HttpOnly = true,
+                //     SameSite = SameSiteMode.Strict,
+                //     Path = "/"
+                // });
+                var data = new
                 {
-                   Success= true,
-                   data= new
-                   {
-                       AccessToken = accesstoken,
-                       RefreshToken =  refreshToken,
-                       
-                       User= new 
-                       {
-                           id= user.Id,
-                           email= user.Email,
-                           firstName= user.firstName,
-                           lastName= user.lastName,
-                           role = roleUser[0],
-                       }
-                     
-                   }
+                    AccessToken = accesstoken,
+                    RefreshToken = refreshToken,
+                    role = roleUser[0],
 
-                   
                 };
+                return new OkObjectResult(data);
             }
-            return new statusDTO()
+            var errorClient = new { message = "Email/Mật khẩu không đúng!" };
+            return new ObjectResult(errorClient)
             {
-                Success = false,
-                data = new
-                {
-                    Message = "Email/Mật khẩu không đúng"
-                }
+                StatusCode = 400
             };
+            
         }
 
 
@@ -180,9 +164,7 @@ namespace BeuStoreApi.Services
                 Email = registerDTO.Email,
                 UserName = registerDTO.Email,
                 firstName= registerDTO.FirstName,
-                lastName= registerDTO.LastName,
-                
-                
+                lastName= registerDTO.LastName,         
             };
             var result = await _userManager.CreateAsync(createUser, registerDTO.Password);
             if (!result.Succeeded)
@@ -196,13 +178,13 @@ namespace BeuStoreApi.Services
                    }
                 };
             }
-            if (!await _roleManager.RoleExistsAsync(RoleUser.Admin))
+            if (!await _roleManager.RoleExistsAsync(RoleUser.User))
             {
-                await _roleManager.CreateAsync(new IdentityRole(RoleUser.Admin));
+                await _roleManager.CreateAsync(new IdentityRole(RoleUser.User));
             }
-            if( await _roleManager.RoleExistsAsync(RoleUser.Admin))
+            if( await _roleManager.RoleExistsAsync(RoleUser.User))
             {
-                await _userManager.AddToRoleAsync(createUser,RoleUser.Admin);
+                await _userManager.AddToRoleAsync(createUser,RoleUser.User);
             }
             return new statusDTO()
             {

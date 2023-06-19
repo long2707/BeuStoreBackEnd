@@ -3,19 +3,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeuStoreApi.Entities
 {
-        [Table("Attribute_Value")]
+       
     public class AttrbuteValue
     {
-        public AttrbuteValue() { }
-
-        [Key]
-       
+        public AttrbuteValue() 
+        { 
+          //  this.AttributeValues = new HashSet<ProductAttributeValues>();
+        }
+        
+        [Key]   
         public Guid Id { get; set; }
-        public Guid attribute_id { get; set; }
-        public string? attribute_value { get; set; }
-        [Column(TypeName ="NVARCHAR(50)")]
-        public string? color { get; set; }
-        public Attrbutes Attrbutes { get; set; }
+     
+        public string attribute_value { get; set; } = string.Empty;
+
+        
+        public virtual Attrbutes Attrbutes { get; set; } = new Attrbutes();
+     //   public virtual ICollection<ProductAttributeValues> AttributeValues { get; set; }
         
     }
 }

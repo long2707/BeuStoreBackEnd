@@ -9,9 +9,9 @@ namespace BeuStoreApi.Entities
             this.products = new HashSet<Products>();
         }
         [Key]
-       public Guid id { get; set; }
+        public Guid id { get; set; }
         [Required]
-        public string tag_name { get; set; }
+        public string tag_name { get; set; }= string.Empty;
         public virtual ICollection<Products> products { get; set; } 
 
     }

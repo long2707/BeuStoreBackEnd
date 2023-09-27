@@ -52,39 +52,53 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "attributes",
+                name: "Attrbutes",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    atrribute_name = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
-                    create_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    atrribute_name = table.Column<string>(type: "NVARCHAR(100)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_attributes", x => x.id);
+                    table.PrimaryKey("PK_Attrbutes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "categories",
+                name: "Carts",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    token_cart = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carts", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Categories",
                 columns: table => new
                 {
                     categoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     parent_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     category_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    category_Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    category_slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    category_Description = table.Column<string>(type: "TEXT", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    update_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_categories", x => x.categoryId);
+                    table.PrimaryKey("PK_Categories", x => x.categoryId);
                     table.ForeignKey(
-                        name: "FK_categories_categories_parent_id",
+                        name: "FK_Categories_Categories_parent_id",
                         column: x => x.parent_id,
-                        principalTable: "categories",
+                        principalTable: "Categories",
                         principalColumn: "categoryId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "customers",
+                name: "Customers",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -96,7 +110,19 @@ namespace BeuStoreApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_customers", x => x.id);
+                    table.PrimaryKey("PK_Customers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Order_Status",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order_Status", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,12 +130,16 @@ namespace BeuStoreApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    product_name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    regular_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    discount_price = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    product_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sale_price = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    compare_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     quantity = table.Column<int>(type: "int", nullable: false),
+                    short_description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     product_description = table.Column<string>(type: "TEXT", nullable: false),
+                    published = table.Column<bool>(type: "bit", nullable: false),
+                    product_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     update_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     created_by = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -121,15 +151,17 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "tags",
+                name: "Tags",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    tag_name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    tag_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    create_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    update_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tags", x => x.id);
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -150,7 +182,7 @@ namespace BeuStoreApi.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -171,7 +203,7 @@ namespace BeuStoreApi.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -191,7 +223,7 @@ namespace BeuStoreApi.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,13 +241,13 @@ namespace BeuStoreApi.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -235,11 +267,11 @@ namespace BeuStoreApi.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "refreshTokens",
+                name: "RefreshToken",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -249,199 +281,265 @@ namespace BeuStoreApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_refreshTokens", x => x.Id);
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_refreshTokens_AspNetUsers_userId",
+                        name: "FK_RefreshToken_AspNetUsers_userId",
                         column: x => x.userId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attribute_Value",
+                name: "AttrbuteValue",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    attribute_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    attribute_value = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    color = table.Column<string>(type: "NVARCHAR(50)", nullable: true),
+                    attribute_value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Attrbutesid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Attribute_Value", x => x.Id);
+                    table.PrimaryKey("PK_AttrbuteValue", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Attribute_Value_attributes_Attrbutesid",
+                        name: "FK_AttrbuteValue_Attrbutes_Attrbutesid",
                         column: x => x.Attrbutesid,
-                        principalTable: "attributes",
+                        principalTable: "Attrbutes",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "carts",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    customersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_carts", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_carts_customers_customersid",
-                        column: x => x.customersid,
-                        principalTable: "customers",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "orders",
+                name: "Orders",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     customersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     create_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    update_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    update_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Order_StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_orders", x => x.id);
+                    table.PrimaryKey("PK_Orders", x => x.id);
                     table.ForeignKey(
-                        name: "FK_orders_customers_customersid",
+                        name: "FK_Orders_Customers_customersid",
                         column: x => x.customersid,
-                        principalTable: "customers",
+                        principalTable: "Customers",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Order_Status_Order_StatusId",
+                        column: x => x.Order_StatusId,
+                        principalTable: "Order_Status",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttrbutesProducts",
+                name: "CategoriesProducts (Dictionary<string, object>)",
                 columns: table => new
                 {
-                    Attrbutesid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductCategoriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductCategoriescategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttrbutesProducts", x => new { x.Attrbutesid, x.productsId });
+                    table.PrimaryKey("PK_CategoriesProducts (Dictionary<string, object>)", x => new { x.ProductCategoriesId, x.ProductCategoriescategoryId });
                     table.ForeignKey(
-                        name: "FK_AttrbutesProducts_attributes_Attrbutesid",
-                        column: x => x.Attrbutesid,
-                        principalTable: "attributes",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AttrbutesProducts_Products_productsId",
-                        column: x => x.productsId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CategoriesProducts",
-                columns: table => new
-                {
-                    CategoriescategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CategoriesProducts", x => new { x.CategoriescategoryId, x.ProductsId });
-                    table.ForeignKey(
-                        name: "FK_CategoriesProducts_categories_CategoriescategoryId",
-                        column: x => x.CategoriescategoryId,
-                        principalTable: "categories",
+                        name: "FK_CategoriesProducts (Dictionary<string, object>)_Categories_ProductCategoriescategoryId",
+                        column: x => x.ProductCategoriescategoryId,
+                        principalTable: "Categories",
                         principalColumn: "categoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CategoriesProducts_Products_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_CategoriesProducts (Dictionary<string, object>)_Products_ProductCategoriesId",
+                        column: x => x.ProductCategoriesId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "gallerles",
+                name: "Gallery",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    product_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PublicId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     urlImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_gallerles", x => x.id);
+                    table.PrimaryKey("PK_Gallery", x => x.id);
                     table.ForeignKey(
-                        name: "FK_gallerles_Products_productsId",
+                        name: "FK_Gallery_Products_productsId",
                         column: x => x.productsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductsTags",
+                name: "ProductAttribute",
                 columns: table => new
                 {
-                    Tagsid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Attrbutesid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductAttribute", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ProductAttribute_Attrbutes_Attrbutesid",
+                        column: x => x.Attrbutesid,
+                        principalTable: "Attrbutes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductAttribute_Products_productsId",
+                        column: x => x.productsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "variant_options",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sale_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    compare_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
                     productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductsTags", x => new { x.Tagsid, x.productsId });
+                    table.PrimaryKey("PK_variant_options", x => x.id);
                     table.ForeignKey(
-                        name: "FK_ProductsTags_Products_productsId",
+                        name: "FK_variant_options_Products_productsId",
                         column: x => x.productsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductsTags_tags_Tagsid",
-                        column: x => x.Tagsid,
-                        principalTable: "tags",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "cart_items",
+                name: "ProductsTags (Dictionary<string, object>)",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Cartsid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    quantity = table.Column<int>(type: "int", nullable: false),
-                    stauts = table.Column<int>(type: "int", nullable: false)
+                    TagsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_cart_items", x => x.Id);
+                    table.PrimaryKey("PK_ProductsTags (Dictionary<string, object>)", x => new { x.ProductsId, x.TagsId });
                     table.ForeignKey(
-                        name: "FK_cart_items_carts_Cartsid",
-                        column: x => x.Cartsid,
-                        principalTable: "carts",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_cart_items_Products_ProductsId",
+                        name: "FK_ProductsTags (Dictionary<string, object>)_Products_ProductsId",
                         column: x => x.ProductsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductsTags (Dictionary<string, object>)_Tags_TagsId",
+                        column: x => x.TagsId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "orderItems",
+                name: "ProductAttributeValues",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AttrbuteValueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductAttributeid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductAttributeValues", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ProductAttributeValues_AttrbuteValue_AttrbuteValueId",
+                        column: x => x.AttrbuteValueId,
+                        principalTable: "AttrbuteValue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductAttributeValues_ProductAttribute_ProductAttributeid",
+                        column: x => x.ProductAttributeid,
+                        principalTable: "ProductAttribute",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Variants",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    productsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    variant_Optionsid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Variants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Variants_Products_productsId",
+                        column: x => x.productsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Variants_variant_options_variant_Optionsid",
+                        column: x => x.variant_Optionsid,
+                        principalTable: "variant_options",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cart_Items",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VariantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Cartsid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    price = table.Column<decimal>(type: "NUMERIC(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cart_Items", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cart_Items_Carts_Cartsid",
+                        column: x => x.Cartsid,
+                        principalTable: "Carts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Cart_Items_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Cart_Items_Variants_VariantsId",
+                        column: x => x.VariantsId,
+                        principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VariantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Ordersid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     price = table.Column<decimal>(type: "NUMERIC(18,2)", nullable: false),
@@ -449,19 +547,50 @@ namespace BeuStoreApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_orderItems", x => x.Id);
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_orderItems_orders_Ordersid",
+                        name: "FK_OrderItems_Orders_Ordersid",
                         column: x => x.Ordersid,
-                        principalTable: "orders",
+                        principalTable: "Orders",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_orderItems_Products_ProductsId",
+                        name: "FK_OrderItems_Products_ProductsId",
                         column: x => x.ProductsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Variants_VariantsId",
+                        column: x => x.VariantsId,
+                        principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Variant_Values",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    variantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    productid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Variant_Values", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Variant_Values_ProductAttributeValues_productid",
+                        column: x => x.productid,
+                        principalTable: "ProductAttributeValues",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Variant_Values_Variants_variantsId",
+                        column: x => x.variantsId,
+                        principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -504,79 +633,119 @@ namespace BeuStoreApi.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AttrbutesProducts_productsId",
-                table: "AttrbutesProducts",
-                column: "productsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Attribute_Value_Attrbutesid",
-                table: "Attribute_Value",
+                name: "IX_AttrbuteValue_Attrbutesid",
+                table: "AttrbuteValue",
                 column: "Attrbutesid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_cart_items_Cartsid",
-                table: "cart_items",
+                name: "IX_Cart_Items_Cartsid",
+                table: "Cart_Items",
                 column: "Cartsid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_cart_items_ProductsId",
-                table: "cart_items",
+                name: "IX_Cart_Items_ProductsId",
+                table: "Cart_Items",
                 column: "ProductsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_carts_customersid",
-                table: "carts",
-                column: "customersid");
+                name: "IX_Cart_Items_VariantsId",
+                table: "Cart_Items",
+                column: "VariantsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_categories_parent_id",
-                table: "categories",
+                name: "IX_Categories_parent_id",
+                table: "Categories",
                 column: "parent_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoriesProducts_ProductsId",
-                table: "CategoriesProducts",
-                column: "ProductsId");
+                name: "IX_CategoriesProducts (Dictionary<string, object>)_ProductCategoriescategoryId",
+                table: "CategoriesProducts (Dictionary<string, object>)",
+                column: "ProductCategoriescategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_gallerles_product_id",
-                table: "gallerles",
-                column: "product_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_gallerles_productsId",
-                table: "gallerles",
+                name: "IX_Gallery_productsId",
+                table: "Gallery",
                 column: "productsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_orderItems_Ordersid",
-                table: "orderItems",
+                name: "IX_OrderItems_Ordersid",
+                table: "OrderItems",
                 column: "Ordersid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_orderItems_ProductsId",
-                table: "orderItems",
+                name: "IX_OrderItems_ProductsId",
+                table: "OrderItems",
                 column: "ProductsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_orders_customersid",
-                table: "orders",
+                name: "IX_OrderItems_VariantsId",
+                table: "OrderItems",
+                column: "VariantsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_customersid",
+                table: "Orders",
                 column: "customersid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_product_name",
-                table: "Products",
-                column: "product_name");
+                name: "IX_Orders_Order_StatusId",
+                table: "Orders",
+                column: "Order_StatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductsTags_productsId",
-                table: "ProductsTags",
+                name: "IX_ProductAttribute_Attrbutesid",
+                table: "ProductAttribute",
+                column: "Attrbutesid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttribute_productsId",
+                table: "ProductAttribute",
                 column: "productsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_refreshTokens_userId",
-                table: "refreshTokens",
+                name: "IX_ProductAttributeValues_AttrbuteValueId",
+                table: "ProductAttributeValues",
+                column: "AttrbuteValueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeValues_ProductAttributeid",
+                table: "ProductAttributeValues",
+                column: "ProductAttributeid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductsTags (Dictionary<string, object>)_TagsId",
+                table: "ProductsTags (Dictionary<string, object>)",
+                column: "TagsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshToken_userId",
+                table: "RefreshToken",
                 column: "userId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_variant_options_productsId",
+                table: "variant_options",
+                column: "productsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variant_Values_productid",
+                table: "Variant_Values",
+                column: "productid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variant_Values_variantsId",
+                table: "Variant_Values",
+                column: "variantsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variants_productsId",
+                table: "Variants",
+                column: "productsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variants_variant_Optionsid",
+                table: "Variants",
+                column: "variant_Optionsid");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -597,55 +766,70 @@ namespace BeuStoreApi.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "AttrbutesProducts");
+                name: "Cart_Items");
 
             migrationBuilder.DropTable(
-                name: "Attribute_Value");
+                name: "CategoriesProducts (Dictionary<string, object>)");
 
             migrationBuilder.DropTable(
-                name: "cart_items");
+                name: "Gallery");
 
             migrationBuilder.DropTable(
-                name: "CategoriesProducts");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
-                name: "gallerles");
+                name: "ProductsTags (Dictionary<string, object>)");
 
             migrationBuilder.DropTable(
-                name: "orderItems");
+                name: "RefreshToken");
 
             migrationBuilder.DropTable(
-                name: "ProductsTags");
-
-            migrationBuilder.DropTable(
-                name: "refreshTokens");
+                name: "Variant_Values");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "attributes");
+                name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "carts");
+                name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "categories");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "orders");
-
-            migrationBuilder.DropTable(
-                name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "tags");
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "customers");
+                name: "ProductAttributeValues");
+
+            migrationBuilder.DropTable(
+                name: "Variants");
+
+            migrationBuilder.DropTable(
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Order_Status");
+
+            migrationBuilder.DropTable(
+                name: "AttrbuteValue");
+
+            migrationBuilder.DropTable(
+                name: "ProductAttribute");
+
+            migrationBuilder.DropTable(
+                name: "variant_options");
+
+            migrationBuilder.DropTable(
+                name: "Attrbutes");
+
+            migrationBuilder.DropTable(
+                name: "Products");
         }
     }
 }

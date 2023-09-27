@@ -12,35 +12,35 @@ namespace BeuStoreApi.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategories _categories;
-        public CategoryController(ICategories categories) 
-        
-        { 
+        public CategoryController(ICategories categories)
+
+        {
             _categories = categories;
         }
 
         [HttpGet("categories")]
         //[Authorize]
-        public async Task<statusDTO> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             return await _categories.GetAllCategory();
         }
-        [HttpPost("create-category"), Authorize(Roles ="admin")]
-        
-        public async Task<statusDTO> saveCategory([FromBody] SaveCategoryDTO saveCategory, Guid? parentId)
+        [HttpPost("create-category"), Authorize(Roles = "admin")]
+
+        public async Task<IActionResult> saveCategory([FromBody] SaveCategoryDTO saveCategory, Guid? parentId)
         {
             return await _categories.SaveCategoryAsync(saveCategory, parentId);
         }
 
-        [HttpPut("update-category"), Authorize(Roles ="admin")]
-       // [Authorize(Roles = "admin")]
-        public async Task<statusDTO> updateCategory([FromBody] SaveCategoryDTO saveCategory, Guid id, Guid? parentId)
+        [HttpPut("update-category"), Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
+        public async Task<IActionResult> updateCategory([FromBody] SaveCategoryDTO saveCategory, Guid id, Guid? parentId)
         {
             return await _categories.updateCategoryAsync(saveCategory, id, parentId);
-                 
+
         }
         [HttpDelete("delete-category")]
-       // [Authorize(Roles = "admin")]
-        public async Task<statusDTO> deleteCategory(Guid id)
+        // [Authorize(Roles = "admin")]
+        public async Task<IActionResult> deleteCategory(Guid id)
         {
             return await _categories.DeleteAsync(id);
         }

@@ -1,36 +1,62 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BeuStoreApi.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace BeuStoreApi.Entities
 {
-    public class MyDbContext:IdentityDbContext<User>
+    public class MyDbContext : IdentityDbContext<User>
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
 
         }
-         public DbSet<Products> products { get; set; }
-        public DbSet<Categories> categories { get; set; } 
-        public DbSet<Gallerles> gallerles { get; set; }
-        public DbSet<Tags> tags { get; set; }
-        public DbSet<Attrbutes> attributes { get; set; }
-        public DbSet<AttrbuteValue> attributeValue { get; set; }
-        public DbSet<OrderItems> orderItems { get; set; }   
-        public DbSet<Orders> orders { get; set; }
-        public DbSet<Customers> customers { get; set; }
-        public DbSet<Carts> carts { get; set; }
-        public DbSet<Cart_Items> cart_items { get; set; }
-        public DbSet<RefreshToken> refreshTokens { get; set; }
-        protected override void OnModelCreating(ModelBuilder builder)
+             public DbSet<RefreshToken> refreshTokens { get; set; }
+             public DbSet<Gallery> galleries { get; set; }
+             public DbSet<Products> products { get;}
+             public DbSet<Categories> categories { get; set; }
+             public DbSet<Tags> tags { get; set; }
+
+            public DbSet<Attrbutes> Attrbutes { get; set; }
+            public DbSet<ProductAttribute> ProductAttribute { get; set; }
+            public DbSet<AttrbuteValue> AttrbuteValues { get; set; }
+            public DbSet<ProductAttributeValues> ProductAttributeValues { get; set; }
+
+            public DbSet<Variants> Variants { get; set; }
+            public DbSet<Variant_Values> VariantValues { get; set; }
+            public DbSet<variant_options> variant_options { get; set; }
+
+            public DbSet<Customers> Customers { get; set; }
+            public DbSet<Orders> Orders { get; set; }
+            public DbSet<Order_Status> OrderStatus { get; set; }
+            public DbSet<OrderItems> OrderItems { get; set; }
+            public DbSet<Carts> Carts { get; set; }
+            public DbSet<Cart_Items> CartItems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
+            if (modelBuilder == null)
+                throw new ArgumentNullException("modelBuilder");
 
-            builder.Entity<Categories>()
-                .HasMany(c => c.Children)
-                .WithOne(c => c.Parent)
-                .HasForeignKey(c => c.parent_id);
+            // for the other conventions, we do a metadata model loop
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                // equivalent of modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+                entityType.SetTableName(entityType.DisplayName());
 
+                // equivalent of modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+                entityType.GetForeignKeys()
+                    .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade)
+                    .ToList()
+                    .ForEach(fk => fk.DeleteBehavior = DeleteBehavior.Restrict);
+            }
+            base.OnModelCreating(modelBuilder);
+
+
+            modelBuilder.Entity<Categories>()
+                    .HasMany(c => c.Children)
+                    .WithOne(c => c.Parent)
+                    .HasForeignKey(c => c.parent_id);
         }
     }
 }

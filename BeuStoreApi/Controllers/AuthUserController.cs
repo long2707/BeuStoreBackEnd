@@ -16,37 +16,37 @@ namespace BeuStoreApi.Controllers
     {
         private readonly IAuthUser _authService;
 
-        public AuthUserController( IAuthUser authService ) 
-        { 
+        public AuthUserController(IAuthUser authService)
+        {
             _authService = authService;
 
         }
 
         [HttpPost("register")]
-        public async Task<statusDTO> Register([FromBody] RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
             return await _authService.Register(registerDTO);
         }
         [HttpPost("login")]
-        public async Task<statusDTO> Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             return await _authService.Login(loginDTO);
         }
 
         [HttpPost("refresh-token")]
-        public async Task<statusDTO> RefreshToken([FromBody] TokenDTO tokenDTO)
+        public async Task<IActionResult> RefreshToken([FromBody] TokenDTO tokenDTO)
         {
             return await _authService.RenewToken(tokenDTO);
         }
         [HttpPost("get-auth")]
         [Authorize]
-        public statusDTO getAuth()
+        public IActionResult getAuth()
         {
             return _authService.getAuth();
         }
         [HttpPost("change-password")]
         [Authorize]
-        public async Task<statusDTO> ChangePassword([FromBody] ChangPassworDTO changPassworDTO)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangPassworDTO changPassworDTO)
         {
             return await _authService.ChangePassword(changPassworDTO);
         }

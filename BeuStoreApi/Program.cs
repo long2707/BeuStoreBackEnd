@@ -3,6 +3,8 @@ using BeuStoreApi.Helper;
 using BeuStoreApi.Mapper;
 using BeuStoreApi.Services;
 using BeuStoreApi.Services.interfaces;
+//using BeuStoreApi.Services;
+//using BeuStoreApi.Services.interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,8 +26,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// connect db
-
+//coonect db
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
 
 
@@ -99,7 +100,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddScoped<jwtToken>();
 builder.Services.AddScoped<IAuthUser, AuthService>();
 builder.Services.AddScoped<ICategories, CategoryService>();
-builder.Services.AddScoped<IProducts, ProductService>();
+//builder.Services.AddScoped<IProducts, ProductService>();
 var app = builder.Build();
 
 

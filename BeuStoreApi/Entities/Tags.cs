@@ -6,13 +6,15 @@ namespace BeuStoreApi.Entities
     {
         public Tags()
         {
-            this.products = new HashSet<Products>();
+            this.Products = new HashSet<Products>();
+
         }
         [Key]
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
         [Required]
-        public string tag_name { get; set; }= string.Empty;
-        public virtual ICollection<Products> products { get; set; } 
-
+        public string tag_name { get; set; } = string.Empty;
+        public DateTime create_at { get; set; } = DateTime.Now;
+        public DateTime update_at { get; set; } = DateTime.Now;
+        public virtual ICollection<Products> Products { get; set; }
     }
 }

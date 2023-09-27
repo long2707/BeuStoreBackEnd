@@ -6,7 +6,7 @@ namespace BeuStoreApi.Entities
     {
         [Key]
         public Guid Id { get; set; }
-        public string Status { get; set; }= string.Empty;
+        public string Status { get; set; } = string.Empty;
         public virtual ICollection<Orders> Orders { get; set; } = new HashSet<Orders>();
     }
 }

@@ -1,14 +1,15 @@
 ﻿using BeuStoreApi.Models;
 using BeuStoreApi.Models.CategoriesModel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BeuStoreApi.Services.interfaces
 {
     public interface ICategories
     {
-        Task<statusDTO> GetAllCategory();
-        Task<statusDTO> SaveCategoryAsync( SaveCategoryDTO saveCategory, Guid? parentId);
-        Task<statusDTO> updateCategoryAsync(SaveCategoryDTO saveCategoryDTO, Guid id, Guid? parentid);
-        Task<statusDTO> DeleteAsync(Guid id);
+        Task<IActionResult> GetAllCategory();
+        Task<IActionResult> SaveCategoryAsync(SaveCategoryDTO saveCategory, Guid? parentId);
+        Task<IActionResult> updateCategoryAsync(SaveCategoryDTO saveCategoryDTO, Guid id, Guid? parentid);
+        Task<IActionResult> DeleteAsync(Guid id);
         //Task<statusDTO> GetByIdAsync(Guid id);
 
     }

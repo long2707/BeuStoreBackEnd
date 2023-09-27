@@ -8,11 +8,11 @@ namespace BeuStoreApi.Services.interfaces
 {
     public interface IAuthUser
     {
-        Task<statusDTO> Register(RegisterDTO registerDTO);
+        Task<IActionResult> Register(RegisterDTO registerDTO);
         Task<IActionResult> Login(LoginDTO loginDTO);
-        Task<statusDTO> RenewToken(TokenDTO tokenDTO);
-        statusDTO getAuth();
-        Task<statusDTO> ChangePassword(ChangPassworDTO changPassworDTO);
+        Task<IActionResult> RenewToken(TokenDTO tokenDTO);
+        IActionResult getAuth();
+        Task<IActionResult> ChangePassword(ChangPassworDTO changPassworDTO);
 
     }
 }

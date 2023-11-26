@@ -10,6 +10,6 @@ namespace BeuStoreApi.Entities
 
 
         public Variants variants { get; set; } = new Variants();
-        public ProductAttributeValues product { get; set; } = new ProductAttributeValues();
+        public ProductAttributeValues productAttributeValue { get; set; } = new ProductAttributeValues();
     }
 }

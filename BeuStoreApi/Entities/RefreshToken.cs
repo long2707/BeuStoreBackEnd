@@ -7,8 +7,8 @@ namespace BeuStoreApi.Entities
         public Guid Id { get; set; }
 
         public string userId { get; set; }
-        [ForeignKey(nameof(userId))]
-        public User user { get; set; } = new User();
+    
+      
         public string refreshToken { get; set; } =string.Empty;
         public DateTime RefreshTokenExpiry { get; set; }
     }

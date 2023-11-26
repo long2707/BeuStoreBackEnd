@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BeuStoreApi.Migrations
 {
-    public partial class db : Migration
+    public partial class db20231119 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -151,6 +151,20 @@ namespace BeuStoreApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshToken",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    userId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    refreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
                 {
@@ -265,26 +279,6 @@ namespace BeuStoreApi.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RefreshToken",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    userId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    refreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RefreshToken_AspNetUsers_userId",
-                        column: x => x.userId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -409,6 +403,7 @@ namespace BeuStoreApi.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     sale_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     compare_price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
@@ -574,14 +569,14 @@ namespace BeuStoreApi.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     variantsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    productid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    productAttributeValueid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Variant_Values", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Variant_Values_ProductAttributeValues_productid",
-                        column: x => x.productid,
+                        name: "FK_Variant_Values_ProductAttributeValues_productAttributeValueid",
+                        column: x => x.productAttributeValueid,
                         principalTable: "ProductAttributeValues",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -718,19 +713,14 @@ namespace BeuStoreApi.Migrations
                 column: "TagsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshToken_userId",
-                table: "RefreshToken",
-                column: "userId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_variant_options_productsId",
                 table: "variant_options",
                 column: "productsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Variant_Values_productid",
+                name: "IX_Variant_Values_productAttributeValueid",
                 table: "Variant_Values",
-                column: "productid");
+                column: "productAttributeValueid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Variant_Values_variantsId",
@@ -790,6 +780,9 @@ namespace BeuStoreApi.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
@@ -800,9 +793,6 @@ namespace BeuStoreApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tags");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "ProductAttributeValues");

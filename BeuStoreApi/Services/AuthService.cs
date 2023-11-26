@@ -41,9 +41,12 @@ namespace BeuStoreApi.Services
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDTO.Password))
             {
-                var roleUser = await _userManager.GetRolesAsync(user);
+   
+              
+                    var userId = user.Id.ToString();
+                    var roleUser = await _userManager.GetRolesAsync(user);
 
-                var authClaims = new List<Claim>
+                    var authClaims = new List<Claim>
                 {
 
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -53,83 +56,72 @@ namespace BeuStoreApi.Services
                     new Claim("Email", user.Email)
                 };
 
-                foreach (var userRole in roleUser)
-                {
-                    authClaims.Add(new Claim("role", userRole));
-                }
-
-                var token = _jwtToken.GetToken(authClaims);
-                var refreshToken = _jwtToken.RefreshToken();
-                var tokenInfo = _dbContext.refreshTokens.FirstOrDefault(a => a.userId == user.Id);
-
-                if (tokenInfo == null)
-                {
-                    var info = new RefreshToken
+                    foreach (var userRole in roleUser)
                     {
-                        Id = new Guid(),
-                        userId = user.Id,
-                        refreshToken = refreshToken,
-                        RefreshTokenExpiry = DateTime.Now.AddDays(1),
-                    };
-                    _dbContext.refreshTokens.Add(info);
-                }
-                else
-                {
-                    tokenInfo.refreshToken = refreshToken;
-                    tokenInfo.RefreshTokenExpiry = DateTime.Now.AddDays(1);
-                }
-                try
-                {
+                        authClaims.Add(new Claim("role", userRole));
+                    }
+
+                    var token = _jwtToken.GetToken(authClaims);
+                    var refreshToken = _jwtToken.RefreshToken();
+                    var tokenInfo = _dbContext.refreshTokens.FirstOrDefault(a => a.userId == user.Id);
+
+                    if (tokenInfo == null)
+                    {
+                        var info = new RefreshToken
+                        {
+                            Id = new Guid(),
+                            userId = userId,
+                            refreshToken = refreshToken,
+                            RefreshTokenExpiry = DateTime.Now.AddDays(1),
+                        };
+                        _dbContext.refreshTokens.Add(info);
+                    }
+                    else
+                    {
+                        tokenInfo.refreshToken = refreshToken;
+                        tokenInfo.RefreshTokenExpiry = DateTime.Now.AddDays(1);
+                    }
                     _dbContext.SaveChanges();
-                }
-                catch
-                {
-                    var errorServer = new { message = "Có lỗi xảy ra. Vui lòng thử lại sau" };
-                    return new ObjectResult(errorServer)
+                    var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                    //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
+                    // {
+                    //   Domain= "localhost:3000",
+                    //     Expires = DateTime.UtcNow.AddHours(1),
+                    //     Secure = true, // Set to true if using HTTPS
+                    //     HttpOnly = true ,// Set to true to prevent client-side JavaScript access
+                    //      SameSite = SameSiteMode.Strict ,
+                    //      Path="/"
+                    // });
+
+
+                    // _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                    // {
+                    //     Domain= "localhost:3000",
+                    //     Expires = DateTime.UtcNow.AddDays(1),
+                    //     Secure = true,
+                    //     HttpOnly = true,
+                    //      SameSite = SameSiteMode.Strict ,
+                    //      Path="/"
+                    // });
+
+                    var data = new
                     {
-                        StatusCode = 500 // Trả về mã lỗi 500 (Internal Server Error)
+                        AccessToken = accesstoken,
+                        RefreshToken = refreshToken,
+
+
                     };
+                    return new OkObjectResult(data);
+               
+                    //var errorServer = new { message = "Có lỗi xảy ra. Vui lòng thử lại sau" };
+                    //return new ObjectResult(errorServer)
+                    //{
+                    //    StatusCode = 500 // Trả về mã lỗi 500 (Internal Server Error)
+                    //};
 
-                }
-                var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
-
-                //_contextAccessor?.HttpContext?.Response.Cookies.Append("accessToken", accesstoken, new CookieOptions
-                // {
-                //   Domain= "localhost:3000",
-                //     Expires = DateTime.UtcNow.AddHours(1),
-                //     Secure = true, // Set to true if using HTTPS
-                //     HttpOnly = true ,// Set to true to prevent client-side JavaScript access
-                //      SameSite = SameSiteMode.Strict ,
-                //      Path="/"
-                // });
-
-
-                // _contextAccessor?.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                // {
-                //     Domain= "localhost:3000",
-                //     Expires = DateTime.UtcNow.AddDays(1),
-                //     Secure = true,
-                //     HttpOnly = true,
-                //      SameSite = SameSiteMode.Strict ,
-                //      Path="/"
-                // });
-                // _contextAccessor?.HttpContext?.Response.Cookies.Append("role", roleUser[0], new CookieOptions
-                // {
-                //     Domain= "localhost:3000",
-                //     Expires = DateTime.UtcNow.AddHours(1),
-                //     Secure = true,
-                //     HttpOnly = true,
-                //     SameSite = SameSiteMode.Strict,
-                //     Path = "/"
-                // });
-                var data = new
-                {
-                    AccessToken = accesstoken,
-                    RefreshToken = refreshToken,
-
-
-                };
-                return new OkObjectResult(data);
+    
+                
             }
             var errorClient = new { message = "Email/Mật khẩu không đúng!" };
             return new ObjectResult(errorClient)
@@ -215,7 +207,7 @@ namespace BeuStoreApi.Services
                 //check 3: Check accessToken expire?
 
                 var jwtToken = jwtTokenHandler.ReadJwtToken(tokenDTO.accessToken) as JwtSecurityToken;
-                var expiryTimeUnix = jwtToken.Claims.FirstOrDefault(x => x.Type == "exp")?.Value;
+                var expiryTimeUnix = jwtToken.Claims.FirstOrDefault(x => x.Type == "exp")?.Value + "";
                 var expiryTimeUtc = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiryTimeUnix)).UtcDateTime;
                 if (expiryTimeUtc > DateTime.UtcNow)
                 {
@@ -232,7 +224,7 @@ namespace BeuStoreApi.Services
                 {
                     return new ObjectResult(new { Message = "Refresh token does not exist" })
                     {
-                        StatusCode = 404
+                        StatusCode = 403
                     };
 
                 }
@@ -243,9 +235,10 @@ namespace BeuStoreApi.Services
                 var authClaims = new List<Claim>
                 {
 
+
+
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("Id", user.Id.ToString()),
-                     new Claim("Id", user.Id.ToString()),
                     new Claim("firstName", user.firstName),
                     new Claim("lastName", user.lastName),
                     new Claim("Email", user.Email)
@@ -295,18 +288,18 @@ namespace BeuStoreApi.Services
                 return new OkObjectResult(new { accesstoken, refreshToken });
 
             }
-            catch
+            catch(Exception ex) 
             {
-                return new ObjectResult(new { Message  = "Something went wrong" })
+                return new ObjectResult(new { Message  = ex.Message })
                 {
-                    StatusCode = 400
+                    StatusCode = 500
                 };
 
             }
         }
         public IActionResult getAuth()
         {
-            string authorizationHeader = _contextAccessor?.HttpContext?.Request?.Headers["Authorization"];
+            string authorizationHeader = _contextAccessor?.HttpContext?.Request?.Headers["Authorization"] + "";
             string token = authorizationHeader.Substring("Bearer ".Length);
 
             var verifyToken = _jwtToken.Verify(token);

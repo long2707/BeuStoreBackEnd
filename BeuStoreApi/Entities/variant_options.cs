@@ -15,6 +15,7 @@ namespace BeuStoreApi.Entities
         [Key]
         public Guid id { get; set; }
 
+        public string title { get; set; }
         public string? SKU { get; set; }
         [Column(TypeName = "numeric(18,2)")]
         [Required]

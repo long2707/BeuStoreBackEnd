@@ -1,12 +1,15 @@
 ﻿//using BeuStoreApi.Entities;
+//using BeuStoreApi.Helper;
 //using BeuStoreApi.Models;
 //using BeuStoreApi.Models.ProductsDTO;
 //using BeuStoreApi.Services.interfaces;
 //using CloudinaryDotNet;
 //using CloudinaryDotNet.Actions;
+//using Microsoft.AspNetCore.Mvc;
 //using Microsoft.AspNetCore.Mvc.RazorPages;
 //using Microsoft.EntityFrameworkCore;
 //using Newtonsoft.Json.Linq;
+//using System.Reflection.Metadata.Ecma335;
 //using System.Text.RegularExpressions;
 
 //namespace BeuStoreApi.Services
@@ -14,28 +17,20 @@
 //    public class ProductService : IProducts
 //    {
 //        private readonly MyDbContext _context;
-//        private readonly IConfiguration _configuration;
-//        private readonly Cloudinary _cloudinary;
-//        private readonly CloudinarySettings _cloudinarySettings;
-//        public ProductService(MyDbContext dbContext, IConfiguration configuration)
+//        private readonly UploadImage _uploadImage;
+       
+//        public ProductService(MyDbContext dbContext, UploadImage uploadImage)
 //        {
 //            _context = dbContext;
-//            _configuration = configuration;
-//            _cloudinarySettings = _configuration.GetSection("CloudinarySetting").Get<CloudinarySettings>();
-//            Account account = new Account
-//              (_cloudinarySettings.CloudName,
-//              _cloudinarySettings.ApiKey,
-//              _cloudinarySettings.ApiSecret
-
-//            );
-//            _cloudinary = new Cloudinary(account);
-//            _cloudinary.Api.Secure = true;
+//            _uploadImage = uploadImage;
+          
+          
 //        }
 //        public async Task<statusDTO> FetchProducts(int page = 1, int pageSize = 10)
 //        {
-//            var queryable = _context.products;
-//            var count = await queryable.CountAsync();
-//            var products = await queryable.AsNoTracking()
+//            var getProducts = _context.products;
+//            var count = await getProducts.CountAsync();
+//            var products = await getProducts.AsNoTracking()
 
 //                                                   .Include(x => x.Galleries)
 
@@ -104,36 +99,31 @@
 //                }
 //            };
 //        }
-//        public async Task<statusDTO> createProductAsync(ProductDTO product)
+//        public async Task<IActionResult> createProductAsync(ProductDTO product)
 //        {
 //            var productExited = await _context.products.FirstOrDefaultAsync(p => p.product_name == product.product_name);
 //            if (productExited != null)
 //            {
-//                return new statusDTO()
+
+//                return new ObjectResult(new { Message = "sản phẩm đã được tạo" })
 //                {
-//                    Success = false,
-//                    data = new
-//                    {
-//                        Message = "sản phẩm đã được tạo"
-//                    }
+//                    StatusCode = 409
 //                };
 //            }
 //            // tags
 //            var tags = new List<Tags>();
 //            if (product.tags == null || product.tags.Length == 0)
 //            {
-//                return new statusDTO()
+
+//                return new ObjectResult(new { Message = "Nhập tối thiểu 3 tags" })
 //                {
-//                    Success = false,
-//                    data = new
-//                    {
-//                        message = "Nhập tối thiểu 3 tags"
-//                    }
+//                    StatusCode = 400
 //                };
+
 //            }
 //            foreach (var item in product.tags)
 //            {
-//                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.tag_name == item);
+//                var tag = await _context.tags.FirstOrDefaultAsync(t => t.tag_name == item);
 //                if (tag == null)
 //                {
 //                    tag = new Tags()
@@ -146,31 +136,29 @@
 //            }
 //            if (tags.Count() < 3)
 //            {
-//                return new statusDTO()
+//                return new ObjectResult(new {Message = "Nhập tối thiểu thêm " + (3 - tags.Count) + " tags" })
 //                {
-//                    Success = false,
-//                    data = new
-//                    {
-//                        message = "Nhập tối thiểu thêm " + (3 - tags.Count) + " tags"
-//                    }
+//                    StatusCode = 400
 //                };
+              
 //            }
 //            //categories
 //            if (product.categories == null || product.categories.Length == 0)
 //            {
-//                return new statusDTO()
+
+//                return new ObjectResult(new
 //                {
-//                    Success = false,
-//                    data = new
-//                    {
-//                        Meassage = "Nhập danh mục sản phẩm"
-//                    }
+//                    Meassage = "Vui lòng chọn danh mục sản phẩm"
+//                })
+//                {
+//                    StatusCode = 400
 //                };
+              
 //            }
 //            var categories = new List<Categories>();
-//            foreach (var item in product.categories)
+//            foreach (var itemCategory in product.categories)
 //            {
-//                var category = await _context.Category.FirstOrDefaultAsync(c => c.category_Name == item);
+//                var category = await _context.categories.FirstOrDefaultAsync(c => c.categoryId == itemCategory);
 //                if (category != null)
 //                {
 //                    categories.Add(category);
@@ -181,9 +169,9 @@
 //            //image
 
 //            var files = product.thumbails;
-//            if (files == null) return new statusDTO() { Success = false, data = new { Message = "ảnh là bắt buôc" } };
+//            if (files == null) return new ObjectResult(new { Message = "ảnh sản phẩm là bắt buộc" });
 
-//            var thumbails = new List<Gallery>();
+//            var thumbnails = new List<Gallery>();
 
 //            foreach (var item in files)
 //            {
@@ -191,29 +179,15 @@
 //                {
 
 
-//                    var uploadResult = new ImageUploadResult();
-//                    string titleImage = Regex.Replace(product.product_name, @"\s", "-");
-//                    var urlImage = Guid.NewGuid() + "_" + titleImage;
-//                    using (var stream = item.OpenReadStream())
-//                    {
-//                        var uploadParams = new ImageUploadParams()
-//                        {
-//                            File = new FileDescription(urlImage, stream),
-//                            PublicId = urlImage,
-//                            DisplayName = titleImage,
-//                            UniqueFilename = true
-
-//                        };
-
-//                        uploadResult = await _cloudinary.UploadAsync(uploadParams);
-//                    }
+//                    var uploadResult = await _uploadImage.UploadImages(item, product.product_name);
 
 //                    var newImage = new Gallery()
 //                    {
 //                        id = new Guid(),
-//                        urlImage = uploadResult.SecureUrl.ToString(),
+//                        urlImage = uploadResult.SecureUrl + "",
+//                        PublicId = uploadResult.PublicId + ""
 //                    };
-//                    thumbails.Add(newImage);
+//                    thumbnails.Add(newImage);
 //                }
 //            }
 //            // attribute
@@ -263,27 +237,19 @@
 //                    created_by = product.created_by,
 //                    Tags = tags,
 //                    ProductCategories = categories,
-//                    Galleries = thumbails,
-//                    ProductAttributes = attributes
+//                    Galleries = thumbnails,
+//                 //   ProductAttributes = attributes
 
 //                };
 //                _context.Add(newProduct);
 //                await _context.SaveChangesAsync();
-//                return new statusDTO()
-//                {
-//                    Success = true,
-//                    data = newProduct
-//                };
+//                return new OkObjectResult(new { Message = "Tạo sản phẩm thành công" });
 //            }
 //            catch
 //            {
-//                return new statusDTO()
+//                return new ObjectResult(new { Message = "Cõ lỗi xảy ra vui lòng thử lại sau!" })
 //                {
-//                    Success = false,
-//                    data = new
-//                    {
-//                        Message = "Có lỗi xảy ra!. Thử lại sau"
-//                    }
+//                    StatusCode = 500
 //                };
 //            }
 //        }
@@ -344,7 +310,7 @@
 //                }
 //                foreach (var item in updateProduct.tags)
 //                {
-//                    var tag = await _context.Tags.FirstOrDefaultAsync(t => t.tag_name == item);
+//                    var tag = await _context.tags.FirstOrDefaultAsync(t => t.tag_name == item);
 //                    if (tag == null)
 //                    {
 //                        tag = new Tags()
@@ -381,11 +347,11 @@
 //                        }
 //                    };
 //                }
-//                productExist.Categories.Clear();
+//                productExist.ProductCategories.Clear();
 //                var categories = new List<Categories>();
 //                foreach (var item in updateProduct.updateCategories)
 //                {
-//                    var category = await _context.Category.FirstOrDefaultAsync(c => c.categoryId == item.CategoryId);
+//                    var category = await _context.categories.FirstOrDefaultAsync(c => c.categoryId == item.CategoryId);
 //                    if (category == null)
 //                    {
 //                        return new statusDTO()
@@ -398,14 +364,14 @@
 
 //                        };
 //                    }
-//                    productExist.Categories.Add(category);
+//                    productExist.ProductCategories.Add(category);
 
 
 //                }
 
 
 //                //thubails
-//                productExist.Gallerles.Clear();
+//                productExist.Galleries.Clear();
 //                var thumbailUrls = updateProduct.thumbailUrls;
 //                var thumbailFiles = updateProduct.thumbailFiles;
 
@@ -581,8 +547,8 @@
 //                    productExist.product_name = updateProduct.product_name;
 //                    productExist.SKU = updateProduct.SKU;
 //                    productExist.product_description = updateProduct.product_description;
-//                    productExist.regular_price = updateProduct.regular_price;
-//                    productExist.discount_price = updateProduct.discount_price;
+//                    productExist.compare_price = updateProduct.regular_price;
+//                    productExist.sale_price = updateProduct.discount_price;
 //                    productExist.quantity = updateProduct.quantity;
 
 //                    //  _context.Update(productExist);

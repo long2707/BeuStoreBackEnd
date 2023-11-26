@@ -380,11 +380,9 @@ namespace BeuStoreApi.Migrations
 
                     b.Property<string>("userId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("userId");
 
                     b.ToTable("RefreshToken");
                 });
@@ -507,6 +505,10 @@ namespace BeuStoreApi.Migrations
                     b.Property<decimal>("sale_price")
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("id");
 
                     b.HasIndex("productsId");
@@ -520,7 +522,7 @@ namespace BeuStoreApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("productid")
+                    b.Property<Guid>("productAttributeValueid")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("variantsId")
@@ -528,7 +530,7 @@ namespace BeuStoreApi.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("productid");
+                    b.HasIndex("productAttributeValueid");
 
                     b.HasIndex("variantsId");
 
@@ -857,17 +859,6 @@ namespace BeuStoreApi.Migrations
                     b.Navigation("ProductAttribute");
                 });
 
-            modelBuilder.Entity("BeuStoreApi.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("BeuStoreApi.Entities.User", "user")
-                        .WithMany()
-                        .HasForeignKey("userId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("user");
-                });
-
             modelBuilder.Entity("BeuStoreApi.Entities.variant_options", b =>
                 {
                     b.HasOne("BeuStoreApi.Entities.Products", "products")
@@ -881,9 +872,9 @@ namespace BeuStoreApi.Migrations
 
             modelBuilder.Entity("BeuStoreApi.Entities.Variant_Values", b =>
                 {
-                    b.HasOne("BeuStoreApi.Entities.ProductAttributeValues", "product")
+                    b.HasOne("BeuStoreApi.Entities.ProductAttributeValues", "productAttributeValue")
                         .WithMany()
-                        .HasForeignKey("productid")
+                        .HasForeignKey("productAttributeValueid")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -893,7 +884,7 @@ namespace BeuStoreApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("product");
+                    b.Navigation("productAttributeValue");
 
                     b.Navigation("variants");
                 });
